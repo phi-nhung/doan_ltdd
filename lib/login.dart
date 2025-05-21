@@ -1,6 +1,7 @@
 import 'package:doan/adminHome.dart';
 import 'package:doan/provider/account_provider.dart';
 import 'package:doan/register.dart';
+import 'package:doan/screens/forgotPasswordScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'login_provider.dart';
@@ -109,18 +110,18 @@ class _LoginScreenState extends State<LoginScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Chưa có tài khoản?", style: TextStyle(color: Color.fromARGB(255, 74, 74, 74))),
+                  Text("Quên mật khẩu?", style: TextStyle(color: Color.fromARGB(255, 74, 74, 74))),
                   TextButton(
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => RegisterScreen(), 
+                          builder: (context) => ForgotPasswordScreen(), 
                         ),
                       );
                     },
                     child: Text(
-                      "Đăng ký",
+                      "Đặt lại",
                       style: TextStyle(
                         color: Color.fromARGB(255, 107, 66, 38), // Nâu mocha
                         fontWeight: FontWeight.bold,

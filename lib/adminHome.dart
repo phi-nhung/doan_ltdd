@@ -92,6 +92,7 @@ class AdminHome extends StatelessWidget {
         final allowedForNhanVien = [
           "Bán hàng",
           "Đơn hàng",
+          "Quản lý bàn",
           "Khách hàng",
           "Doanh thu",
           "Cài đặt",
