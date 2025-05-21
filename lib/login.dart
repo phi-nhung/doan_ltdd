@@ -1,5 +1,6 @@
 import 'package:doan/adminHome.dart';
 import 'package:doan/provider/account_provider.dart';
+import 'package:doan/register.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'login_provider.dart';
@@ -110,7 +111,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   Text("Chưa có tài khoản?", style: TextStyle(color: Color.fromARGB(255, 74, 74, 74))),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RegisterScreen(), 
+                        ),
+                      );
+                    },
                     child: Text(
                       "Đăng ký",
                       style: TextStyle(

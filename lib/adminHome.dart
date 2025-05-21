@@ -7,6 +7,7 @@ import 'package:doan/qlban.dart';
 import 'package:doan/qlmathang.dart';
 import 'package:doan/qlnhanvien.dart';
 import 'package:doan/quanlykhachhang.dart';
+import 'package:doan/screens/CreateEmployeeAccountScreen.dart';
 import 'package:doan/screens/order_list_screen.dart';
 import 'package:doan/screens/order_screen.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +39,7 @@ class AdminHome extends StatelessWidget {
       _DashboardItem(const QL_NhanVien(), Icons.people, "Nhân viên"),
       _DashboardItem(DoanhThu(), Icons.bar_chart_outlined, "Doanh thu"),
       _DashboardItem(const OrderScreen(), Icons.settings, "Cài đặt"),
+      _DashboardItem(const CreateEmployeeAccountScreen(), Icons.person_add_alt_1_rounded, "Cấp tài tài khoản"),
     ];
 
     return Scaffold(

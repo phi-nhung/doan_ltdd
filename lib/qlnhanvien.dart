@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'database_helper.dart';
+import 'database_helper.dart'; // Đảm bảo đường dẫn này đúng
 
 class QL_NhanVien extends StatefulWidget {
   const QL_NhanVien({super.key});
@@ -22,37 +22,37 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
   }
 
   Future<void> _loadNhanVien({String position = "Tất cả"}) async {
-  String sql = '''
-    SELECT MANHANVIEN, HOTEN, CHUCVU, SDT
-    FROM NHANVIEN
-  ''';
+    String sql = '''
+      SELECT MANHANVIEN, HOTEN, CHUCVU, SDT
+      FROM NHANVIEN
+    ''';
 
-  List<Object?> args = [];
+    List<Object?> args = [];
 
-  if (position != "Tất cả") {
-    sql += " WHERE CHUCVU = ?";
-    args.add(position);
+    if (position != "Tất cả") {
+      sql += " WHERE CHUCVU = ?";
+      args.add(position);
+    }
+
+    final data = await DatabaseHelper.rawQuery(sql, args);
+    setState(() {
+      nhanvien = data;
+      selectedPosition = position;
+    });
   }
-
-  final data = await DatabaseHelper.rawQuery(sql, args);
-  setState(() {
-    nhanvien = data;
-    selectedPosition = position;
-  });
-}
 
 
   Future<void> _searchNhanVien(String keyword) async {
-  final data = await DatabaseHelper.rawQuery('''
-    SELECT MANHANVIEN, HOTEN, CHUCVU, SDT
-    FROM NHANVIEN
-    WHERE HOTEN LIKE ?
-  ''', ['%$keyword%']);
+    final data = await DatabaseHelper.rawQuery('''
+      SELECT MANHANVIEN, HOTEN, CHUCVU, SDT
+      FROM NHANVIEN
+      WHERE HOTEN LIKE ?
+    ''', ['%$keyword%']);
 
-  setState(() {
-    nhanvien = data;
-  });
-}
+    setState(() {
+      nhanvien = data;
+    });
+  }
 
 
   void _showAddDialog() {
@@ -134,9 +134,40 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
     );
   }
 
+  // Sửa đổi hàm _deleteEmployee để xóa cả trong bảng USER
   void _deleteEmployee(int manv) async {
-    await DatabaseHelper.delete('NHANVIEN', manv, idColumn: 'MANHANVIEN');
-    _loadNhanVien();
+    try {
+      // Bước 1: Xóa tài khoản USER liên quan
+      // Tìm USER có MANV tương ứng với MANHANVIEN của nhân viên
+      final userResult = await DatabaseHelper.rawQuery(
+        'SELECT ID FROM USER WHERE MANV = ?',
+        [manv],
+      );
+
+      if (userResult.isNotEmpty) {
+        int userIdToDelete = userResult.first['ID'];
+        await DatabaseHelper.delete('USER', userIdToDelete, idColumn: 'ID');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đã xóa tài khoản người dùng liên quan.')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Không tìm thấy tài khoản người dùng liên quan.')),
+        );
+      }
+
+      // Bước 2: Xóa nhân viên khỏi bảng NHANVIEN
+      await DatabaseHelper.delete('NHANVIEN', manv, idColumn: 'MANHANVIEN');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đã xóa nhân viên thành công.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi khi xóa nhân viên: ${e.toString()}')),
+      );
+    } finally {
+      _loadNhanVien(); // Tải lại danh sách nhân viên sau khi xóa
+    }
   }
 
   void _confirmDeleteEmployee(int manv) {
@@ -144,7 +175,7 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
       context: context,
       builder: (_) => AlertDialog(
         title: Text('Xác nhận xoá'),
-        content: Text('Bạn có chắc chắn muốn xoá nhân viên này không?'),
+        content: Text('Bạn có chắc chắn muốn xoá nhân viên này không? Thao tác này cũng sẽ xoá tài khoản đăng nhập liên quan.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: Text('Huỷ')),
           TextButton(
@@ -223,7 +254,7 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
                   ],
                 )
               ],
-            )
+            ),
           ),
           const SizedBox(height: 10),
           Expanded(
