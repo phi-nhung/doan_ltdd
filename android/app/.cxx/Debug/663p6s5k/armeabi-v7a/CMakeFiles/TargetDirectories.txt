@@ -1,0 +1,2 @@
+D:/KY_THUAT_LAP_TRINH/LTDD/doan_29_4/doan/doan/doan/android/app/.cxx/Debug/663p6s5k/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/KY_THUAT_LAP_TRINH/LTDD/doan_29_4/doan/doan/doan/android/app/.cxx/Debug/663p6s5k/armeabi-v7a/CMakeFiles/rebuild_cache.dir
