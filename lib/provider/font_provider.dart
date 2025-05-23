@@ -15,7 +15,7 @@ class FontProvider extends ChangeNotifier {
 
   Future<void> _loadSavedFont() async {
     final prefs = await SharedPreferences.getInstance();
-    _currentFont = prefs.getString(FONT_KEY) ?? 'Poppins'; // Sửa mặc định thành 'Poppins'
+    _currentFont = prefs.getString(FONT_KEY) ?? 'Roboto'; // Sửa mặc định thành 'Poppins'
     notifyListeners();
   }
 
@@ -28,9 +28,17 @@ class FontProvider extends ChangeNotifier {
   }
 
   TextTheme get textTheme => TextTheme(
+        displayLarge: TextStyle(fontFamily: _currentFont),
+        displayMedium: TextStyle(fontFamily: _currentFont),
+        displaySmall: TextStyle(fontFamily: _currentFont),
+        headlineLarge: TextStyle(fontFamily: _currentFont),
+        headlineMedium: TextStyle(fontFamily: _currentFont),
+        headlineSmall: TextStyle(fontFamily: _currentFont),
+        titleLarge: TextStyle(fontFamily: _currentFont),
+        titleMedium: TextStyle(fontFamily: _currentFont),
+        titleSmall: TextStyle(fontFamily: _currentFont),
         bodyLarge: TextStyle(fontFamily: _currentFont),
         bodyMedium: TextStyle(fontFamily: _currentFont),
-        titleLarge: TextStyle(fontFamily: _currentFont),
-        // Add more text styles as needed
+        bodySmall: TextStyle(fontFamily: _currentFont),
       );
 }

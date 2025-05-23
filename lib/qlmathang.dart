@@ -309,6 +309,50 @@ class _QL_MatHangState extends State<QL_MatHang> {
     );
   }
 
+  void _showAddCategoryDialog() {
+    TextEditingController categoryController = TextEditingController();
+    TextEditingController descController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text("Thêm danh mục mới"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: categoryController,
+              decoration: InputDecoration(labelText: "Tên danh mục"),
+            ),
+            TextField(
+              controller: descController,
+              decoration: InputDecoration(labelText: "Mô tả"),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Huỷ"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (categoryController.text.isNotEmpty) {
+                await DatabaseHelper.insert('DANHMUC', {
+                  'TENDANHMUC': categoryController.text,
+                  'MOTA': descController.text,
+                });
+                Navigator.pop(context);
+                _loadDanhMuc(); // Tải lại danh sách danh mục
+              }
+            },
+            child: Text("Thêm"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<String> categoryList = ["Tất cả", ...danhmuc.map((dm) => dm['TENDANHMUC'] as String)];
@@ -324,46 +368,84 @@ class _QL_MatHangState extends State<QL_MatHang> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                DropdownButton<String>(
-                  value: selectedCategory,
-                  underline: SizedBox(),
-                  icon: Icon(Icons.arrow_drop_down, color: Color.fromARGB(255, 18, 18, 18)),
-                  style: TextStyle(color: Color.fromARGB(255, 18, 18, 18), fontSize: 16),
-                  items: categoryList.map((String value) => DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  )).toList(),
-                  onChanged: (newValue) {
-                    if (newValue != null) {
-                      _loadMatHang(category: newValue);
-                    }
-                  },
-                ),
-                Container(
-                  width: 150,
-                  height: 40,
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey.shade400),
+                // Phần dropdown và nút thêm danh mục
+                Flexible(
+                  flex: 2,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(
+                        child: DropdownButton<String>(
+                          value: selectedCategory,
+                          isExpanded: true,
+                          underline: SizedBox(),
+                          icon: Icon(Icons.arrow_drop_down, 
+                            color: Color.fromARGB(255, 18, 18, 18)),
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 18, 18, 18), 
+                            fontSize: 16
+                          ),
+                          items: categoryList.map((String value) => 
+                            DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            )
+                          ).toList(),
+                          onChanged: (newValue) {
+                            if (newValue != null) {
+                              _loadMatHang(category: newValue);
+                            }
+                          },
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.add_circle_outline, 
+                          color: Color.fromARGB(255, 18, 18, 18)),
+                        onPressed: () => _showAddCategoryDialog(),
+                        padding: EdgeInsets.zero,
+                        constraints: BoxConstraints(),
+                      ),
+                    ],
                   ),
-                  child: TextField(
-                    controller: searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Tìm theo tên',
-                      border: InputBorder.none,
-                    ),
-                    onSubmitted: (value) {
-                      _searchMatHang(value.trim());
-                    },
-                  ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.search, color: Color.fromARGB(255, 18, 18, 18)),
-                  onPressed: () {
-                    _searchMatHang(searchController.text.trim());
-                  },
+
+                // Phần tìm kiếm
+                Flexible(
+                  flex: 3,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          height: 40,
+                          padding: EdgeInsets.symmetric(horizontal: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey.shade400),
+                          ),
+                          child: TextField(
+                            controller: searchController,
+                            decoration: InputDecoration(
+                              hintText: 'Tìm theo tên',
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                            onSubmitted: (value) => _searchMatHang(value.trim()),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.search, 
+                          color: Color.fromARGB(255, 18, 18, 18)),
+                        onPressed: () => _searchMatHang(searchController.text.trim()),
+                        padding: EdgeInsets.zero,
+                        constraints: BoxConstraints(),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
