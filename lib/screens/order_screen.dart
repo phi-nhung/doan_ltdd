@@ -354,354 +354,341 @@
                                 return Center(child: Text("Không có bàn"));
                               }
 
-                              final tables = snapshot.data!;
-                              return GridView.builder(
-                                padding: EdgeInsets.all(10),
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount:
-                                          MediaQuery.of(context).size.width > 600
-                                              ? 4
-                                              : 3,
-                                      crossAxisSpacing: 10,
-                                      mainAxisSpacing: 10,
+                            final tables = snapshot.data!;
+                            return GridView.builder(
+                              padding: EdgeInsets.all(10),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount:
+                                        MediaQuery.of(context).size.width > 600
+                                            ? 4
+                                            : 3,
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 10,
+                                  ),
+                              itemCount: tables.length,
+                              itemBuilder: (context, index) {
+                                final table = tables[index];
+                                final isServing = cart.tableItems[table.soban]?.isNotEmpty == true;
+                                return GestureDetector(
+                                  onTap: () async {
+                                    if (!isServing && table.trangthai == 'Trống') {
+                                      await Provider.of<CartProvider>(context, listen: false).updateTableStatus(table.soban, 'Đang phục vụ');
+                                      setState(() {
+                                        _tablesFuture = fetchTablesFromDB();
+                                        _selectedTable = table.soban;
+                                      });
+                                    } else if (isServing || table.trangthai == 'Đang phục vụ') {
+                                      setState(() {
+                                        _selectedTable = table.soban;
+                                      });
+                                    }
+                                  },
+                                  child: Card(
+                                    color: isServing || table.trangthai == 'Đang phục vụ'
+                                        ? Colors.red.shade100
+                                        : Colors.white,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.table_chart,
+                                          size: 40,
+                                          color: _selectedTable == table.soban
+                                              ? Color(0xFF121212)
+                                              : (isServing || table.trangthai == 'Đang phục vụ')
+                                                  ? Colors.red
+                                                  : Color(0xFF2A2D32),
+                                        ),
+                                        Text(
+                                          "Bàn ${table.soban}",
+                                          style: TextStyle(
+                                            color: Color(0xFF4A4A4A),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          isServing ? 'Đang phục vụ' : table.trangthai,
+                                          style: TextStyle(
+                                            color: isServing ? Colors.red : Color(0xFF4A4A4A),
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        if (cart.tableItems.containsKey(table.soban))
+                                          Text(
+                                            '${cart.tableItems[table.soban]!.fold<int>(0, (sum, item) => sum + item.quantity)} món',
+                                            style: TextStyle(
+                                              color: Colors.green,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                      ],
                                     ),
-                                itemCount: tables.length,
-                                itemBuilder: (context, index) {
-                                  final table = tables[index];
-                                  final isServing = cart.tableItems[table.soban]?.isNotEmpty == true;
-                                  return GestureDetector(
-                                    onTap: () async {
-                                      if (!isServing && table.trangthai == 'Trống') {
-                                        await Provider.of<CartProvider>(context, listen: false).updateTableStatus(table.soban, 'Đang phục vụ');
-                                        setState(() {
-                                          _tablesFuture = fetchTablesFromDB();
-                                          _selectedTable = table.soban;
-                                        });
-                                      } else if (isServing || table.trangthai == 'Đang phục vụ') {
-                                        setState(() {
-                                          _selectedTable = table.soban;
-                                        });
-                                      }
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    if (_orderType == 'Mang đi' || _selectedTable != null)
+                      Expanded(
+                        child: Column(
+                          children: [
+                            if (_selectedTable != null)
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.table_chart,
+                                      size: 40,
+                                      color: Color(0xFF121212), // Đen than
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      "Bàn $_selectedTable",
+                                      style: TextStyle(
+                                        color: Color(0xFF1E1E1E),
+                                        fontSize: 14,
+                                      ), // Đen tinh tế
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: FutureBuilder<List<String>>(
+                                future: fetchCategories(),
+                                builder: (context, snapshot) {
+                                  final categories =
+                                      snapshot.data ?? ['Tất cả'];
+                                  return DropdownButton<String>(
+                                    value: _selectedCategory,
+                                    onChanged: (String? newValue) {
+                                      setState(() {
+                                        _selectedCategory = newValue!;
+                                      });
                                     },
-                                    child: Card(
-                                      color: isServing || table.trangthai == 'Đang phục vụ'
-                                          ? Colors.red.shade100
-                                          : Colors.white,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.table_chart,
-                                            size: 40,
-                                            color: _selectedTable == table.soban
-                                                ? Color(0xFF121212)
-                                                : (isServing || table.trangthai == 'Đang phục vụ')
-                                                    ? Colors.red
-                                                    : Color(0xFF2A2D32),
-                                          ),
-                                          Text(
-                                            "Bàn ${table.soban}",
-                                            style: TextStyle(
-                                              color: Color(0xFF4A4A4A),
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
+                                    items:
+                                        categories.map((String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(
+                                              value,
+                                              style: TextStyle(fontSize: 14),
                                             ),
-                                          ),
-                                          Text(
-                                            isServing ? 'Đang phục vụ' : table.trangthai,
-                                            style: TextStyle(
-                                              color: isServing ? Colors.red : Color(0xFF4A4A4A),
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                          if (cart.tableItems.containsKey(table.soban))
-                                            Text(
-                                              '${cart.tableItems[table.soban]!.fold<int>(0, (sum, item) => sum + item.quantity)} món',
-                                              style: TextStyle(
-                                                color: Colors.green,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                        ],
-                                      ),
+                                          );
+                                        }).toList(),
+                                    style: TextStyle(color: Colors.black),
+                                    dropdownColor: Colors.white,
+                                    iconEnabledColor: Colors.black,
+                                    underline: Container(
+                                      height: 2,
+                                      color: Colors.black,
                                     ),
                                   );
                                 },
-                              );
-                            },
-                          ),
-                        ),
-                      if (_orderType == 'Mang đi' || _selectedTable != null)
-                        Expanded(
-                          child: Column(
-                            children: [
-                              if (_selectedTable != null)
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.table_chart,
-                                        size: 40,
-                                        color: Color(0xFF121212), // Đen than
-                                      ),
-                                      SizedBox(width: 10),
-                                      Text(
-                                        "Bàn $_selectedTable",
-                                        style: TextStyle(
-                                          color: Color(0xFF1E1E1E),
-                                          fontSize: 14,
-                                        ), // Đen tinh tế
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: FutureBuilder<List<String>>(
-                                  future: fetchCategories(),
-                                  builder: (context, snapshot) {
-                                    final categories =
-                                        snapshot.data ?? ['Tất cả'];
-                                    return DropdownButton<String>(
-                                      value: _selectedCategory,
-                                      onChanged: (String? newValue) {
-                                        setState(() {
-                                          _selectedCategory = newValue!;
-                                        });
-                                      },
-                                      items:
-                                          categories.map((String value) {
-                                            return DropdownMenuItem<String>(
-                                              value: value,
-                                              child: Text(
-                                                value,
-                                                style: TextStyle(fontSize: 14),
-                                              ),
-                                            );
-                                          }).toList(),
-                                      style: TextStyle(color: Colors.black),
-                                      dropdownColor: Colors.white,
-                                      iconEnabledColor: Colors.black,
-                                      underline: Container(
-                                        height: 2,
-                                        color: Colors.black,
-                                      ),
-                                    );
-                                  },
-                                ),
                               ),
-                              Expanded(
-                                child: FutureBuilder<List<Item>>(
-                                  future: fetchItemsFromDB(
-                                    category: _selectedCategory,
-                                    search: _searchQuery,
-                                  ),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return Center(
-                                        child: CircularProgressIndicator(),
-                                      );
-                                    }
-                                    if (!snapshot.hasData ||
-                                        snapshot.data!.isEmpty) {
-                                      return Center(
-                                        child: Text("Không có sản phẩm"),
-                                      );
-                                    }
-                                    final items = snapshot.data!;
-                                    return GridView.builder(
-                                      padding: EdgeInsets.all(10),
-                                      gridDelegate:
-                                          SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount:
-                                                MediaQuery.of(
-                                                          context,
-                                                        ).size.width >
-                                                        600
-                                                    ? 4
-                                                    : 2,
-                                            crossAxisSpacing: 10,
-                                            mainAxisSpacing: 10,
-                                            childAspectRatio: 0.7,
-                                          ),
-                                      itemCount: items.length,
-                                      itemBuilder: (context, index) {
-                                        final item = items[index];
-                                        return Card(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                          ),
-                                          elevation: 5,
-                                          shadowColor: Colors.black.withOpacity(
-                                            0.5,
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Expanded(
-                                                  child:
-                                                      item.image != null
-                                                          ? Image.memory(
-                                                            item.image!,
-                                                            fit: BoxFit.cover,
-                                                          )
-                                                          : Icon(
-                                                            Icons.image,
-                                                            size: 60,
-                                                            color: Colors.grey,
-                                                          ),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        vertical: 8.0,
-                                                      ),
-                                                  child: Column(
-                                                    children: [
-                                                      Text(
-                                                        item.name,
-                                                        style: TextStyle(
-                                                          fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Color(
-                                                            0xFF1E1E1E,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        "${item.price}đ",
-                                                        style: TextStyle(
-                                                          color: Color(
-                                                            0xFF6B4226,
-                                                          ),
-                                                          fontSize: 12,
-                                                        ),
-                                                      ),
-                                                      SizedBox(height: 5),
-                                                      Text(
-                                                        item.unit,
-                                                        style: TextStyle(
-                                                          fontSize: 10,
-                                                          color: Color(
-                                                            0xFF4A4A4A,
-                                                          ),
-                                                        ),
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        maxLines: 2,
-                                                        overflow:
-                                                            TextOverflow.ellipsis,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                ElevatedButton(
-                                                  onPressed: () {
-                                                    _showOptionsDialog(
-                                                      context,
-                                                      item,
-                                                      cart,
-                                                    );
-                                                  },
-                                                  style: ElevatedButton.styleFrom(
-                                                    backgroundColor: Color(
-                                                      0xFF121212,
-                                                    ),
-                                                    foregroundColor: Colors.white,
-                                                    padding: EdgeInsets.symmetric(
-                                                      vertical: 8,
-                                                      horizontal: 16,
-                                                    ),
-                                                    textStyle: TextStyle(
-                                                      fontSize: 12,
-                                                    ),
-                                                  ),
-                                                  child: Text("Thêm"),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      if (_selectedTable != null &&
-                          _tableStatus[_selectedTable!] == 'Chờ thanh toán')
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              // Show invoice dialog for the selected table
-                              final tableItems =
-                                  cart.tableItems[_selectedTable!] ?? [];
-                              final tableTotalAmount = cart.getTableTotalAmount(
-                                _selectedTable!,
-                              );
-                              _showInvoiceDialog(
-                                context,
-                                tableItems,
-                                tableTotalAmount,
-                                cart,
-                                _selectedTable,
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF121212), // Đen than
-                              foregroundColor: Colors.white,
-                              padding: EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
-                              ),
-                              textStyle: TextStyle(fontSize: 14),
                             ),
-                            child: Text("Thanh Toán"),
-                          ),
-                        ),
-                      if (_selectedTable != null &&
-                          cart.tableItems.containsKey(_selectedTable))
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => CheckoutScreen(
-                                    tableNumber: _selectedTable,
-                                    onCheckout: () {
-                                      setState(() {
-                                        _selectedTable = null;
-                                      });
-                                      Navigator.pop(context);
-                                    },
-                                  ),
+                            Expanded(
+                              child: FutureBuilder<List<Item>>(
+                                future: fetchItemsFromDB(
+                                  category: _selectedCategory,
+                                  search: _searchQuery,
                                 ),
-                              );
-                            },
-                            child: Text('Thanh toán'),
-                          ),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+                                  if (!snapshot.hasData ||
+                                      snapshot.data!.isEmpty) {
+                                    return Center(
+                                      child: Text("Không có sản phẩm"),
+                                    );
+                                  }
+                                  final items = snapshot.data!;
+                                  return GridView.builder(
+                                    padding: EdgeInsets.all(10),
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount:
+                                              MediaQuery.of(
+                                                        context,
+                                                      ).size.width >
+                                                      600
+                                                  ? 4
+                                                  : 2,
+                                          crossAxisSpacing: 10,
+                                          mainAxisSpacing: 10,
+                                          childAspectRatio: 0.7,
+                                        ),
+                                    itemCount: items.length,
+                                    itemBuilder: (context, index) {
+                                      final item = items[index];
+                                      return Card(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                        elevation: 5,
+                                        shadowColor: Colors.black.withOpacity(
+                                          0.5,
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child:
+                                                    item.image != null
+                                                        ? Image.memory(
+                                                          item.image!,
+                                                          fit: BoxFit.cover,
+                                                        )
+                                                        : Icon(
+                                                          Icons.image,
+                                                          size: 60,
+                                                          color: Colors.grey,
+                                                        ),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      vertical: 8.0,
+                                                    ),
+                                                child: Column(
+                                                  children: [
+                                                    Text(
+                                                      item.name,
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Color(
+                                                          0xFF1E1E1E,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      "${item.price}đ",
+                                                      style: TextStyle(
+                                                        color: Color(
+                                                          0xFF6B4226,
+                                                        ),
+                                                        fontSize: 12,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 5),
+                                                    Text(
+                                                      item.unit,
+                                                      style: TextStyle(
+                                                        fontSize: 10,
+                                                        color: Color(
+                                                          0xFF4A4A4A,
+                                                        ),
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      maxLines: 2,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  _showOptionsDialog(
+                                                    context,
+                                                    item,
+                                                    cart,
+                                                  );
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Color(
+                                                    0xFF121212,
+                                                  ),
+                                                  foregroundColor: Colors.white,
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 8,
+                                                    horizontal: 16,
+                                                  ),
+                                                  textStyle: TextStyle(
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                                child: Text("Thêm"),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                    ],
-                  ),
+                      ),
+                    if (_selectedTable != null &&
+                        _tableStatus[_selectedTable!] == 'Chờ thanh toán')
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // Show invoice dialog for the selected table
+                            final tableItems =
+                                cart.tableItems[_selectedTable!] ?? [];
+                            final tableTotalAmount = cart.getTableTotalAmount(
+                              _selectedTable!,
+                            );
+                            _showInvoiceDialog(
+                              context,
+                              tableItems,
+                              tableTotalAmount,
+                              cart,
+                              _selectedTable,
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF121212), // Đen than
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 20,
+                            ),
+                            textStyle: TextStyle(fontSize: 14),
+                          ),
+                          child: Text("Thanh Toán"),
+                        ),
+                      ),
+                    if (_selectedTable != null &&
+                        cart.tableItems.containsKey(_selectedTable))
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            _showTableCartDialog(context, _selectedTable!, cart);
+                          },
+                          child: Text('Thanh toán'),
+                        ),
+                      ),
+                  ],
                 ),
-      );
-    }
+              ),
+    );
+  }
 
     void _showInvoiceDialog(
       BuildContext context,
@@ -950,36 +937,128 @@
       }
     }
 
-    /* Future<void> _saveOrder(List<CartItem> items, double totalAmount, String paymentMethod) async {
-    try {
-      // Thêm hóa đơn
-      final now = DateTime.now();
-      final orderSql = '''
-        INSERT INTO HOADON (NGAYTAO, TONGTIEN, HINHTHUCMUA, MABAN, MANV)
-        VALUES (?, ?, ?, ?, ?)
-      ''';
-      final orderId = await DatabaseHelper.rawInsert(
-        orderSql,
-        [now.toIso8601String(), totalAmount, paymentMethod, _selectedTable, 1], // 1 là MANV mặc định
-      );
-
-      // Thêm chi tiết hóa đơn
-      for (var item in items) {
-        await DatabaseHelper.rawInsert('''
-          INSERT INTO CHITIETHOADON (MAHD, MASANPHAM, SOLUONG, DONGIA)
-          VALUES (?, ?, ?, ?)
-        ''', [orderId, item.item.id, item.quantity, item.item.price]);
-      }
-
-      // Cập nhật trạng thái bàn nếu có
-      if (_selectedTable != null) {
-        await updateTableStatus(_selectedTable!, 'Trống');
-      }
-
-    } catch (e) {
-      throw Exception('Lỗi khi lưu hóa đơn: $e');
-    }
-  }*/
+  void _showTableCartDialog(BuildContext context, int tableNumber, CartProvider cart) {
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setStateDialog) {
+          final tableItems = cart.tableItems[tableNumber] ?? [];
+          return AlertDialog(
+            title: Text('Xác nhận thanh toán - Bàn $tableNumber'),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ...tableItems.map((item) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          item.item.image != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(6),
+                                child: Image.memory(item.item.image!, width: 36, height: 36, fit: BoxFit.cover),
+                              )
+                            : Icon(Icons.image, size: 36),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(item.item.name, style: TextStyle(fontWeight: FontWeight.w500)),
+                                Row(
+                                  children: [
+                                    Text('SL:'),
+                                    IconButton(
+                                      icon: Icon(Icons.remove, size: 18),
+                                      constraints: BoxConstraints(),
+                                      padding: EdgeInsets.zero,
+                                      onPressed: item.quantity > 1
+                                        ? () async {
+                                            await cart.updateCartItem(item, item.quantity - 1);
+                                            setStateDialog(() {});
+                                          }
+                                        : null,
+                                    ),
+                                    Text('${item.quantity}', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    IconButton(
+                                      icon: Icon(Icons.add, size: 18),
+                                      constraints: BoxConstraints(),
+                                      padding: EdgeInsets.zero,
+                                      onPressed: () async {
+                                        await cart.updateCartItem(item, item.quantity + 1);
+                                        setStateDialog(() {});
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text('${item.item.price * item.quantity}đ', style: TextStyle(fontWeight: FontWeight.w500)),
+                              IconButton(
+                                icon: Icon(Icons.delete, color: Colors.red, size: 20),
+                                constraints: BoxConstraints(),
+                                padding: EdgeInsets.zero,
+                                onPressed: () async {
+                                  cart.removeFromCart(item);
+                                  setStateDialog(() {});
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    )),
+                    Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Tổng tiền:', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text('${cart.getTableTotalAmount(tableNumber).toStringAsFixed(0)}đ', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                child: Text('Hủy'),
+                onPressed: () => Navigator.pop(ctx),
+              ),
+              ElevatedButton(
+                child: Text('Xác nhận thanh toán'),
+                onPressed: tableItems.isEmpty
+                  ? null
+                  : () {
+                      Navigator.pop(ctx);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CheckoutScreen(
+                            tableNumber: tableNumber,
+                            onCheckout: () {
+                              cart.clearTableCart(tableNumber);
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                      );
+                    },
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
 
     void _showCustomerSearchDialog(BuildContext context) {
       final TextEditingController phoneController = TextEditingController();
@@ -1118,3 +1197,8 @@
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
+
+
+
+
+
