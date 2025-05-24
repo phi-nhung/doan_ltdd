@@ -679,20 +679,7 @@ class _OrderScreenState extends State<OrderScreen> {
                         padding: const EdgeInsets.all(8.0),
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => CheckoutScreen(
-                                  tableNumber: _selectedTable,
-                                  onCheckout: () {
-                                    setState(() {
-                                      _selectedTable = null;
-                                    });
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ),
-                            );
+                            _showTableCartDialog(context, _selectedTable!, cart);
                           },
                           child: Text('Thanh toán'),
                         ),
@@ -950,36 +937,128 @@ class _OrderScreenState extends State<OrderScreen> {
     }
   }
 
-  /* Future<void> _saveOrder(List<CartItem> items, double totalAmount, String paymentMethod) async {
-  try {
-    // Thêm hóa đơn
-    final now = DateTime.now();
-    final orderSql = '''
-      INSERT INTO HOADON (NGAYTAO, TONGTIEN, HINHTHUCMUA, MABAN, MANV)
-      VALUES (?, ?, ?, ?, ?)
-    ''';
-    final orderId = await DatabaseHelper.rawInsert(
-      orderSql,
-      [now.toIso8601String(), totalAmount, paymentMethod, _selectedTable, 1], // 1 là MANV mặc định
+  void _showTableCartDialog(BuildContext context, int tableNumber, CartProvider cart) {
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setStateDialog) {
+          final tableItems = cart.tableItems[tableNumber] ?? [];
+          return AlertDialog(
+            title: Text('Xác nhận thanh toán - Bàn $tableNumber'),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ...tableItems.map((item) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          item.item.image != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(6),
+                                child: Image.memory(item.item.image!, width: 36, height: 36, fit: BoxFit.cover),
+                              )
+                            : Icon(Icons.image, size: 36),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(item.item.name, style: TextStyle(fontWeight: FontWeight.w500)),
+                                Row(
+                                  children: [
+                                    Text('SL:'),
+                                    IconButton(
+                                      icon: Icon(Icons.remove, size: 18),
+                                      constraints: BoxConstraints(),
+                                      padding: EdgeInsets.zero,
+                                      onPressed: item.quantity > 1
+                                        ? () async {
+                                            await cart.updateCartItem(item, item.quantity - 1);
+                                            setStateDialog(() {});
+                                          }
+                                        : null,
+                                    ),
+                                    Text('${item.quantity}', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    IconButton(
+                                      icon: Icon(Icons.add, size: 18),
+                                      constraints: BoxConstraints(),
+                                      padding: EdgeInsets.zero,
+                                      onPressed: () async {
+                                        await cart.updateCartItem(item, item.quantity + 1);
+                                        setStateDialog(() {});
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text('${item.item.price * item.quantity}đ', style: TextStyle(fontWeight: FontWeight.w500)),
+                              IconButton(
+                                icon: Icon(Icons.delete, color: Colors.red, size: 20),
+                                constraints: BoxConstraints(),
+                                padding: EdgeInsets.zero,
+                                onPressed: () async {
+                                  cart.removeFromCart(item);
+                                  setStateDialog(() {});
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    )),
+                    Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Tổng tiền:', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text('${cart.getTableTotalAmount(tableNumber).toStringAsFixed(0)}đ', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                child: Text('Hủy'),
+                onPressed: () => Navigator.pop(ctx),
+              ),
+              ElevatedButton(
+                child: Text('Xác nhận thanh toán'),
+                onPressed: tableItems.isEmpty
+                  ? null
+                  : () {
+                      Navigator.pop(ctx);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CheckoutScreen(
+                            tableNumber: tableNumber,
+                            onCheckout: () {
+                              cart.clearTableCart(tableNumber);
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                      );
+                    },
+              ),
+            ],
+          );
+        },
+      ),
     );
-
-    // Thêm chi tiết hóa đơn
-    for (var item in items) {
-      await DatabaseHelper.rawInsert('''
-        INSERT INTO CHITIETHOADON (MAHD, MASANPHAM, SOLUONG, DONGIA)
-        VALUES (?, ?, ?, ?)
-      ''', [orderId, item.item.id, item.quantity, item.item.price]);
-    }
-
-    // Cập nhật trạng thái bàn nếu có
-    if (_selectedTable != null) {
-      await updateTableStatus(_selectedTable!, 'Trống');
-    }
-
-  } catch (e) {
-    throw Exception('Lỗi khi lưu hóa đơn: $e');
   }
-}*/
 
   void _showCustomerSearchDialog(BuildContext context) {
     final TextEditingController phoneController = TextEditingController();
