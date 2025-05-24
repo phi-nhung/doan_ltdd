@@ -34,11 +34,11 @@ class _DoanhThuState extends State<DoanhThu> {
       rawData = await DatabaseHelper.rawQuery(
         "SELECT hd.TONGTIEN, hd.MAKH, kh.HOTEN FROM HOADON hd "
         "LEFT JOIN KHACHHANG kh ON hd.MAKH = kh.MAKH "
-        "WHERE hd.NGAYTAO = '$todayStr'"
+        "WHERE hd.NGAYTAO LIKE '$todayStr%'"
       );
 
       _totalRevenue = rawData.fold(
-          0.0, (sum, item) => sum + (item['TONGTIEN'] ?? 0).toDouble());
+          0.0, (sum, item) => sum + (item['TONGTIEN'] ?? 0).toDouble(),);
 
       // Lấy danh sách khách hàng và tổng tiền
       final customerMap = <String, Map<String, dynamic>>{};
@@ -75,11 +75,11 @@ class _DoanhThuState extends State<DoanhThu> {
         final dailyData = await DatabaseHelper.rawQuery(
           "SELECT hd.TONGTIEN, hd.MAKH, kh.HOTEN FROM HOADON hd "
           "LEFT JOIN KHACHHANG kh ON hd.MAKH = kh.MAKH "
-          "WHERE hd.NGAYTAO = '$dateStr'"
+          "WHERE hd.NGAYTAO LIKE '$dateStr%'"
         );
         
         double dailyTotal = dailyData.fold(
-            0.0, (sum, item) => sum + (item['TONGTIEN'] ?? 0).toDouble());
+            0.0, (sum, item) => sum + (item['TONGTIEN'] ?? 0).toDouble(),);
         _totalRevenue += dailyTotal;
 
         // Tổng hợp thông tin khách hàng
@@ -108,26 +108,26 @@ class _DoanhThuState extends State<DoanhThu> {
       _customerList = customerMap.values.toList();
       _totalCustomers = _customerList.length;
     } else if (_selectedFilter == 'Tháng') {
-      final startOfMonth = DateTime(now.year, now.month, 1);
-      final endOfMonth = DateTime(now.year, now.month + 1, 0);
-      final daysInMonth = endOfMonth.day;
+      final currentYear = now.year;
       final customerMap = <String, Map<String, dynamic>>{};
 
-      for (int i = 0; i < daysInMonth; i++) {
-        final day = DateTime(now.year, now.month, i + 1);
-        final dateStr = DateFormat('yyyy-MM-dd').format(day);
-        final dailyData = await DatabaseHelper.rawQuery(
+      for (int month = 1; month <= 12; month++) {
+        final startDate = DateTime(currentYear, month, 1);
+        final endDate = DateTime(currentYear, month + 1, 0);
+        
+        final monthData = await DatabaseHelper.rawQuery(
           "SELECT hd.TONGTIEN, hd.MAKH, kh.HOTEN FROM HOADON hd "
           "LEFT JOIN KHACHHANG kh ON hd.MAKH = kh.MAKH "
-          "WHERE hd.NGAYTAO = '$dateStr'"
+          "WHERE hd.NGAYTAO >= '${DateFormat('yyyy-MM-dd').format(startDate)}' "
+          "AND hd.NGAYTAO <= '${DateFormat('yyyy-MM-dd').format(endDate)}'"
         );
 
-        double dailyTotal = dailyData.fold(
-            0.0, (sum, item) => sum + (item['TONGTIEN'] ?? 0).toDouble());
-        _totalRevenue += dailyTotal;
+        double monthTotal = monthData.fold(
+            0.0, (sum, item) => sum + (item['TONGTIEN'] ?? 0).toDouble(),);
+        _totalRevenue += monthTotal;
 
         // Tổng hợp thông tin khách hàng
-        for (var item in dailyData) {
+        for (var item in monthData) {
           final maKH = item['MAKH'].toString();
           if (customerMap.containsKey(maKH)) {
             customerMap[maKH]!['TONGTIEN'] += (item['TONGTIEN'] ?? 0).toDouble();
@@ -141,9 +141,9 @@ class _DoanhThuState extends State<DoanhThu> {
 
         _barGroups.add(
           BarChartGroupData(
-            x: i,
+            x: month - 1, // Bắt đầu từ 0 (Tháng 1)
             barRods: [
-              BarChartRodData(toY: dailyTotal, color: Colors.brown),
+              BarChartRodData(toY: monthTotal, color: Colors.brown),
             ],
           ),
         );
@@ -213,11 +213,7 @@ class _DoanhThuState extends State<DoanhThu> {
                                   final dayOfWeek = DateFormat('E').format(day);
                                   return Text(dayOfWeek);
                                 } else if (_selectedFilter == 'Tháng') {
-                                  final day = DateTime(DateTime.now().year, DateTime.now().month, value.toInt() + 1);
-                                  return Text('${day.day}');
-                                } else if (_selectedFilter == 'Năm') {
-                                  final month = value.toInt() + 1;
-                                  return Text('Tháng $month');
+                                  return Text('T${value.toInt() + 1}'); // Hiển thị Tháng 1, Tháng 2,...
                                 }
                                 return Text('');
                               },
