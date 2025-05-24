@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
 import 'package:doan/screens/order_screen.dart';
+import 'package:provider/provider.dart';
+import 'provider/cart_provider.dart';
 
 class QL_Ban extends StatefulWidget {
   const QL_Ban({super.key});
@@ -199,74 +201,84 @@ class _QL_BanState extends State<QL_Ban> {
             ),
           ),
           Expanded(
-            child: GridView.count(
-              crossAxisCount: 2,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-              padding: const EdgeInsets.all(8),
-              children: dsBan.map((ban) {
-                return Container(
+            child: Consumer<CartProvider>(
+              builder: (context, cartProvider, _) {
+                return GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
                   padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Color(0xFFF7F7F7),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Bàn ${ban['SOBAN']}", style: TextStyle(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 4),
-                      Row(
+                  children: dsBan.map((ban) {
+                    final soban = ban['SOBAN'];
+                    final isServing = cartProvider.tableItems[soban]?.isNotEmpty == true;
+                    final tongTienBan = isServing
+                        ? cartProvider.getTableTotalAmount(soban)
+                        : ban['TONGTIEN'];
+                    final trangThaiBan = isServing ? 'Đang phục vụ' : (ban['TRANGTHAI'] ?? '');
+                    return Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF7F7F7),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(Icons.circle, size: 10, color: _getStatusColor(ban['TRANGTHAI'] ?? '')),
-                          SizedBox(width: 4),
-                          Text(ban['TRANGTHAI'] ?? '', style: TextStyle(fontSize: 12)),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        "Giờ: ${ban['GIO'] ?? 'N/A'}",
-                        style: TextStyle(fontSize: 12, color: Colors.black54),
-                      ),
-                      Text(
-                        "Tổng tiền: ${_formatCurrency(ban['TONGTIEN'])}",
-                        style: TextStyle(fontSize: 12, color: Colors.black54),
-                      ),
-                      Spacer(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.edit, size: 20),
-                            onPressed: () => _showEditDialog(ban),
+                          Text("Bàn $soban", style: TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(Icons.circle, size: 10, color: _getStatusColor(trangThaiBan)),
+                              SizedBox(width: 4),
+                              Text(trangThaiBan, style: TextStyle(fontSize: 12)),
+                            ],
                           ),
-                          IconButton(
-                            icon: Icon(Icons.delete, size: 20),
-                            onPressed: () => _confirmDelete(ban['MABAN']),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Giờ: ${ban['GIO'] ?? 'N/A'}",
+                            style: TextStyle(fontSize: 12, color: Colors.black54),
                           ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              textStyle: TextStyle(fontSize: 16),
-                              backgroundColor: const Color.fromARGB(255, 237, 235, 235),
-                            ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => OrderScreen(datban: ban['SOBAN']),
+                          Text(
+                            "Tổng tiền: ${_formatCurrency(tongTienBan)}",
+                            style: TextStyle(fontSize: 12, color: Colors.black54),
+                          ),
+                          Spacer(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.edit, size: 20),
+                                onPressed: () => _showEditDialog(ban),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete, size: 20),
+                                onPressed: () => _confirmDelete(ban['MABAN']),
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  textStyle: TextStyle(fontSize: 16),
+                                  backgroundColor: const Color.fromARGB(255, 237, 235, 235),
                                 ),
-                              );
-                            },
-                            child: Text("Đặt bàn", style: TextStyle(color: Color.fromARGB(255, 18, 18, 18))),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => OrderScreen(datban: ban['SOBAN']),
+                                    ),
+                                  ).then((_) => _loadBan());
+                                },
+                                child: Text("Đặt bàn", style: TextStyle(color: Color.fromARGB(255, 18, 18, 18))),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
+                    );
+                  }).toList(),
                 );
-              }).toList(),
+              },
             ),
           ),
         ],

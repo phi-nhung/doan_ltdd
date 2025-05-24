@@ -4,16 +4,14 @@ import '../provider/locale_provider.dart';
 
 class AppLocalizations {
   static String get(BuildContext context, String key) {
-    final locale = Provider.of<LocaleProvider>(context, listen: true).locale.languageCode;
+    final locale = Provider.of<LocaleProvider>(context, listen: false).locale.languageCode;
     final _localizedValues = {
       'vi': {
-        // Navigation & Titles
-        'coffee_shop': 'Quán Cafe',
-        'menu': 'Thực đơn',
-        'home': 'Trang chủ',
+        // App Name
+        'app_name': 'KIOT',
         
         // Dashboard Items
-        'order': 'Bán hàng',
+        'sell': 'Bán hàng',
         'orders': 'Đơn hàng',
         'table_management': 'Quản lý bàn',
         'menu_management': 'Quản lý menu',
@@ -21,52 +19,36 @@ class AppLocalizations {
         'employees': 'Nhân viên',
         'revenue': 'Doanh thu',
         'settings': 'Cài đặt',
+        'create_account': 'Cấp tài khoản',
+        
+        // Account Menu
+        'account': 'Tài khoản',
+        'logout': 'Đăng xuất',
+        
+        // Messages
+        'loading': 'Đang tải...',
+        'admin_only': 'Chỉ có quản lý mới được thực thi chức năng này.',
+        'notification': 'Thông báo',
+        'close': 'Đóng',
         
         // Settings Screen
-        'dark_mode': 'Chế độ tối',
+        'settings_title': 'Cài đặt',
         'language': 'Ngôn ngữ',
-        'notifications': 'Thông báo',
-        'security': 'Bảo mật',
-        'version': 'Phiên bản',
-        
-        // Order Screen
-        'take_away': 'Mang đi',
-        'at_table': 'Tại bàn',
-        'table': 'Bàn',
-        'empty': 'Trống',
-        'in_use': 'Đang sử dụng',
-        'search_product': 'Tìm kiếm sản phẩm',
-        'add': 'Thêm',
-        'cancel': 'Hủy',
-        'save': 'Lưu',
-        
-        // Account
-        'account': 'Tài khoản',
-        'profile': 'Hồ sơ',
-        'logout': 'Đăng xuất',
-        'full_name': 'Họ và tên',
-        'email': 'Email',
-        'phone': 'Số điện thoại',
-        
-        // Common
-        'all': 'Tất cả',
-        'today': 'Hôm nay',
-        'yesterday': 'Hôm qua',
-        'this_week': 'Tuần này',
-        'edit': 'Chỉnh sửa',
-        'delete': 'Xóa',
-        'confirm': 'Xác nhận',
+        'vietnamese': 'Tiếng Việt',
+        'english': 'Tiếng Anh',
+        'theme': 'Giao diện',
+        'dark_mode': 'Chế độ tối',
+        'light_mode': 'Chế độ sáng',
         'font': 'Phông chữ',
-        'dashboard': 'Trang chủ quản trị',
+        'save': 'Lưu',
+        'cancel': 'Hủy',
       },
       'en': {
-        // Navigation & Titles
-        'coffee_shop': 'Coffee Shop',
-        'menu': 'Menu',
-        'home': 'Home',
+        // App Name
+        'app_name': 'KIOT',
         
         // Dashboard Items
-        'order': 'Order',
+        'sell': 'Sell',
         'orders': 'Orders',
         'table_management': 'Table Management',
         'menu_management': 'Menu Management',
@@ -74,43 +56,29 @@ class AppLocalizations {
         'employees': 'Employees',
         'revenue': 'Revenue',
         'settings': 'Settings',
+        'create_account': 'Create Account',
         
-        // Settings Screen
-        'dark_mode': 'Dark Mode',
-        'language': 'Language',
-        'notifications': 'Notifications',
-        'security': 'Security',
-        'version': 'Version',
-        
-        // Order Screen
-        'take_away': 'Take Away',
-        'at_table': 'Dine In',
-        'table': 'Table',
-        'empty': 'Empty',
-        'in_use': 'In Use',
-        'search_product': 'Search Product',
-        'add': 'Add',
-        'cancel': 'Cancel',
-        'save': 'Save',
-        
-        // Account
+        // Account Menu
         'account': 'Account',
-        'profile': 'Profile',
         'logout': 'Logout',
-        'full_name': 'Full Name',
-        'email': 'Email',
-        'phone': 'Phone',
         
-        // Common
-        'all': 'All',
-        'today': 'Today',
-        'yesterday': 'Yesterday',
-        'this_week': 'This Week',
-        'edit': 'Edit',
-        'delete': 'Delete',
-        'confirm': 'Confirm',
+        // Messages
+        'loading': 'Loading...',
+        'admin_only': 'Only administrators can access this feature.',
+        'notification': 'Notification',
+        'close': 'Close',
+        
+        // Settings Screen  
+        'settings_title': 'Settings',
+        'language': 'Language',
+        'vietnamese': 'Vietnamese',
+        'english': 'English', 
+        'theme': 'Theme',
+        'dark_mode': 'Dark mode',
+        'light_mode': 'Light mode',
         'font': 'Font',
-        'dashboard': 'Dashboard',
+        'save': 'Save',
+        'cancel': 'Cancel',
       }
     };
     return _localizedValues[locale]?[key] ?? key;

@@ -14,6 +14,9 @@ import 'package:doan/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:doan/screens/settings_screen.dart';
+import 'utils/app_localizations.dart';
+import 'package:doan/provider/locale_provider.dart';
 
 class AdminHome extends StatelessWidget {
   const AdminHome({Key? key}) : super(key: key);
@@ -32,22 +35,37 @@ class AdminHome extends StatelessWidget {
     final String chucVu = nhanVien.chucVu.toLowerCase();
 
     final List<_DashboardItem> allItems = [
-      _DashboardItem(const OrderScreen(), Icons.sell_outlined, "Bán hàng"),
-      _DashboardItem(OrderListScreen(), Icons.list_alt_rounded, "Đơn hàng"),
-      _DashboardItem(const QL_Ban(), Icons.table_chart, "Quản lý bàn"),
-      _DashboardItem(const QL_MatHang(), Icons.menu_book, "Quản lý menu"),
-      _DashboardItem(QL_KhachHang(), Icons.person_pin_outlined, "Khách hàng"),
-      _DashboardItem(const QL_NhanVien(), Icons.people, "Nhân viên"),
-      _DashboardItem(DoanhThu(), Icons.bar_chart_outlined, "Doanh thu"),
-      _DashboardItem(const SettingsScreen(), Icons.settings, "Cài đặt"),
-      _DashboardItem(const CreateEmployeeAccountScreen(), Icons.person_add_alt_1_rounded, "Cấp tài tài khoản"),
+      _DashboardItem(const OrderScreen(), Icons.sell_outlined, 
+        AppLocalizations.get(context, 'sell')),
+      _DashboardItem(OrderListScreen(), Icons.list_alt_rounded, 
+        AppLocalizations.get(context, 'orders')),
+      _DashboardItem(const QL_Ban(), Icons.table_chart, 
+        AppLocalizations.get(context, 'table_management')),
+      _DashboardItem(const QL_MatHang(), Icons.menu_book, 
+        AppLocalizations.get(context, 'menu_management')),
+      _DashboardItem(QL_KhachHang(), Icons.person_pin_outlined, 
+        AppLocalizations.get(context, 'customers')),
+      _DashboardItem(const QL_NhanVien(), Icons.people, 
+        AppLocalizations.get(context, 'employees')),
+      _DashboardItem(DoanhThu(), Icons.bar_chart_outlined, 
+        AppLocalizations.get(context, 'revenue')),
+      _DashboardItem(const SettingsScreen(), Icons.settings, 
+        AppLocalizations.get(context, 'settings')),
+      _DashboardItem(const CreateEmployeeAccountScreen(), Icons.person_add_alt_1_rounded, 
+        AppLocalizations.get(context, 'create_account')),
     ];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "KIOT",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 50),
+        title: Consumer<LocaleProvider>(
+          builder: (context, provider, child) => Text(
+            AppLocalizations.get(context, 'app_name'),
+            style: const TextStyle(
+              color: Colors.white, 
+              fontWeight: FontWeight.bold, 
+              fontSize: 50
+            ),
+          ),
         ),
         backgroundColor: Colors.brown,
         actions: [
@@ -75,62 +93,74 @@ class AdminHome extends StatelessWidget {
           ),
         ],
       ),
-      body: GridView.count(
-        crossAxisCount: 2,
-        padding: const EdgeInsets.all(16),
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        children: allItems
-            .map((item) => _buildDashboardItem(context, item.widget, item.icon, item.title, chucVu))
-            .toList(),
+      body: Consumer<LocaleProvider>(
+        builder: (context, provider, child) {
+          return GridView.count(
+            crossAxisCount: 2,
+            padding: const EdgeInsets.all(16),
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            children: allItems
+                .map((item) => _buildDashboardItem(
+                    context, item.widget, item.icon, item.title, chucVu))
+                .toList(),
+          );
+        },
       ),
     );
   }
 
   Widget _buildDashboardItem(BuildContext context, Widget app, IconData icon, String title, String chucVu) {
-    return GestureDetector(
-      onTap: () {
-        final allowedForNhanVien = [
-          "Bán hàng",
-          "Đơn hàng",
-          "Quản lý bàn",
-          "Khách hàng",
-          "Doanh thu",
-          "Cài đặt",
-        ];
+    return Consumer<LocaleProvider>(
+      builder: (context, provider, child) => GestureDetector(
+        onTap: () {
+          final allowedForNhanVien = [
+            AppLocalizations.get(context, 'sell'),
+            AppLocalizations.get(context, 'orders'),
+            AppLocalizations.get(context, 'table_management'),
+            AppLocalizations.get(context, 'customers'),
+            AppLocalizations.get(context, 'revenue'),
+            AppLocalizations.get(context, 'settings'),
+          ];
 
-        if ((chucVu == 'nhân viên' || chucVu == 'nhan vien') && !allowedForNhanVien.contains(title)) {
-          showDialog(
-            context: context,
-            builder: (_) => AlertDialog(
-              title: const Text("Thông báo"),
-              content: const Text("Chỉ có quản lý mới được thực thi chức năng này."),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Đóng"),
-                )
-              ],
-            ),
+          if ((chucVu == 'nhân viên' || chucVu == 'nhan vien') && !allowedForNhanVien.contains(title)) {
+            showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                title: Text(AppLocalizations.get(context, 'notification')),
+                content: Text(AppLocalizations.get(context, 'admin_only')),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(AppLocalizations.get(context, 'close')),
+                  )
+                ],
+              ),
+            );
+            return;
+          }
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => app),
           );
-          return;
-        }
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => app),
-        );
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 4,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 40, color: Colors.brown),
-            const SizedBox(height: 10),
-            Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          ],
+        },
+        child: Card(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 4,
+          child: Column(
+            children: [
+              Icon(icon, size: 40, color: Colors.brown),
+              const SizedBox(height: 10),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16, 
+                  fontWeight: FontWeight.bold
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -141,23 +171,23 @@ class AdminHome extends StatelessWidget {
       context: context,
       position: const RelativeRect.fromLTRB(100, 60, 0, 0),
       items: [
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'account',
           child: Row(
             children: [
               Icon(Icons.account_circle, color: Colors.black),
               SizedBox(width: 8),
-              Text('Tài khoản'),
+              Text(AppLocalizations.get(context, 'account')),
             ],
           ),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'logout',
           child: Row(
             children: [
               Icon(Icons.logout, color: Colors.black),
               SizedBox(width: 8),
-              Text('Đăng xuất'),
+              Text(AppLocalizations.get(context, 'logout')),
             ],
           ),
         ),

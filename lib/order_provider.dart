@@ -2,42 +2,41 @@ import 'package:doan/database_helper.dart';
 import 'package:doan/model/oder.dart';
 
 class OrderService {
-  final String _tableName = 'HOADON'; // Đảm bảo tên bảng là 'orders' hoặc tên bảng hóa đơn của bạn
-  final String _idColumn = 'MAHD'; // Tên cột ID trong bảng
+  final String _tableName = 'HOADON';
+  final String _idColumn = 'MAHD';
 
-Future<List<Order>> fetchOrders({String? searchType, String? keyword}) async {
-  final db = await DatabaseHelper.database;
+  Future<List<Order>> fetchOrders({String? searchType, String? keyword}) async {
+    final db = await DatabaseHelper.database;
 
-  String whereClause = '';
-  List<String> whereArgs = [];
+    String whereClause = '';
+    List<dynamic> whereArgs = [];
 
-  if (keyword != null && keyword.isNotEmpty) {
-    if (searchType == 'Mã hóa đơn') {
-      whereClause = 'WHERE d.MAHD = ?';
-      whereArgs.add(keyword);
-    } else if (searchType == 'Số điện thoại') {
-      whereClause = 'WHERE k.SDT = ?';
-      whereArgs.add(keyword);
+    if (keyword != null && keyword.isNotEmpty) {
+      if (searchType == 'Mã hóa đơn') {
+        whereClause = 'WHERE d.MAHD = ?';
+        whereArgs.add(int.tryParse(keyword) ?? -1);
+      } else if (searchType == 'Số điện thoại') {
+        whereClause = 'WHERE k.SDT = ?';
+        whereArgs.add(keyword);
+      }
     }
+
+    final result = await db.rawQuery('''
+      SELECT d.*,
+             k.HOTEN AS TENKHACHHANG,
+             k.SDT AS SDTKH,
+             nv.HOTEN AS HOTENNHANVIEN,
+             b.SOBAN
+      FROM HOADON d
+      LEFT JOIN KHACHHANG k ON d.MAKH = k.MAKH -- Đã sửa: Thay đổi thành LEFT JOIN
+      LEFT JOIN NHANVIEN nv ON d.MANV = nv.MANHANVIEN
+      LEFT JOIN BAN b ON d.MABAN = b.MABAN
+      $whereClause
+      ORDER BY MAHD DESC
+    ''', whereArgs);
+
+    return result.map((row) => Order.fromMap(row)).toList();
   }
-
-  final result = await db.rawQuery('''
-    SELECT d.*,
-           k.HOTEN AS TENKHACHHANG,
-           k.SDT AS SDTKH,
-           nv.HOTEN AS HOTENNHANVIEN,
-           b.SOBAN
-    FROM HOADON d
-    JOIN KHACHHANG k ON d.MAKH = k.MAKH
-    LEFT JOIN NHANVIEN nv ON d.MANV = nv.MANHANVIEN
-    LEFT JOIN BAN b ON d.MABAN = b.MABAN
-    ORDER BY ABS(strftime('%s', d.NGAYTAO) - strftime('%s', 'now')) ASC;
-    $whereClause
-  ''', whereArgs);
-
-  return result.map((row) => Order.fromMap(row)).toList();
-}
-
 
 
   Future<Order?> fetchOrderById(int id) async {

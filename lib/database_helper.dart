@@ -97,4 +97,13 @@ class DatabaseHelper {
       return null;
     }
   }
+  static Future<int> rawInsert(String sql, List<Object?> arguments) async {
+    final db = await database;
+    return await db.rawInsert(sql, arguments);
+  }
+
+  static Future<int> rawUpdate(String sql, [List<Object?>? arguments]) async {
+    final db = await database;
+    return await db.rawUpdate(sql, arguments);
+  }
 }

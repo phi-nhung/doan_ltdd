@@ -1,37 +1,58 @@
 import 'package:doan/login_provider.dart';
 import 'package:doan/provider/account_provider.dart';
 import 'package:doan/provider/cart_provider.dart';
-import 'package:doan/provider/font_provider.dart';
 import 'package:doan/provider/locale_provider.dart';
 import 'package:doan/provider/theme_provider.dart';
+import 'package:doan/provider/font_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:doan/login.dart';
 
 void main() {
   runApp(
     MultiProvider(
-  providers: [
-    ChangeNotifierProvider(create: (_) => LoginProvider()),
-    ChangeNotifierProvider(create: (_) => AccountProvider()), 
-    ChangeNotifierProvider(create: (context) => CartProvider()),
-    ChangeNotifierProvider(create: (_) => ThemeProvider()),
+      providers: [
+        ChangeNotifierProvider(create: (_) => LoginProvider()),
+        ChangeNotifierProvider(create: (_) => AccountProvider()),
+        ChangeNotifierProvider(create: (context) => CartProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => FontProvider()),
-  ],
-  child: const MyApp(),
-)
+      ],
+      child: const MyApp(),
+    ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+    return Consumer3<ThemeProvider, LocaleProvider, FontProvider>(
+      builder: (context, themeProvider, localeProvider, fontProvider, child) {
+        final baseTheme = themeProvider.isDarkMode ? ThemeData.dark() : ThemeData.light();
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: LoginScreen(),
+          theme: baseTheme.copyWith(
+            textTheme: baseTheme.textTheme.apply(
+              fontFamily: fontProvider.currentFont,
+            ),
+          ),
+          locale: localeProvider.locale,
+          supportedLocales: const [
+            Locale('vi'),
+            Locale('en'),
+          ],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+        );
+      },
     );
   }
 }

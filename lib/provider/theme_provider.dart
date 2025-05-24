@@ -12,113 +12,55 @@ class ThemeProvider with ChangeNotifier {
   bool get isDarkMode => _isDarkMode;
 
   ThemeData get currentTheme {
+    final lightTheme = ThemeData.light();
+    
     if (_isDarkMode) {
       return ThemeData.dark().copyWith(
-        brightness: Brightness.dark,
-        primaryColor: Colors.brown[200],
-        scaffoldBackgroundColor: const Color(0xFF181818),
-        cardColor: const Color(0xFF232323),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF232323),
+        scaffoldBackgroundColor: Color.fromARGB(255, 48, 53, 58),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Color(0xFF35383D),
           foregroundColor: Colors.white,
-          elevation: 0,
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-          iconTheme: IconThemeData(
-            color: Colors.white,
-          ),
-        ),
-        textTheme: const TextTheme(
-          displayLarge: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-          displayMedium: TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-          ),
-          displaySmall: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-          ),
-          titleLarge: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-          titleMedium: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-          ),
-          titleSmall: TextStyle(
-            color: Colors.white70,
-            fontSize: 14,
-          ),
-          bodyLarge: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-          ),
-          bodyMedium: TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-          ),
-          bodySmall: TextStyle(
-            color: Colors.white70,
-            fontSize: 12,
-          ),
-          labelLarge: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-          ),
-          labelMedium: TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-          ),
-          labelSmall: TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-          ),
-        ),
-        iconTheme: IconThemeData(
-          color: Colors.brown[200],
-          size: 28,
+          iconTheme: IconThemeData(color: Colors.white),
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
         ),
         cardTheme: CardTheme(
-          color: const Color(0xFF232323),
+          color: Color(0xFF2C2F34),
           elevation: 2,
           margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: BorderSide(
-              color: Colors.white.withOpacity(0.08),
-              width: 1,
-            ),
           ),
         ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.brown[200],
-            foregroundColor: Colors.black,
-            elevation: 0,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            textStyle: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
+        listTileTheme: ListTileThemeData(
+          tileColor: Color(0xFF2C2F34),
+          textColor: Colors.white,
+          iconColor: Colors.white70,
+          titleTextStyle: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
           ),
+          subtitleTextStyle: TextStyle(
+            color: Color(0xFFB0B3B8),
+            fontSize: 14,
+          ),
+        ),
+        textTheme: ThemeData.dark().textTheme.apply(
+          bodyColor: Colors.white,
+          displayColor: Colors.white,
+        ),
+        drawerTheme: DrawerThemeData(
+          backgroundColor: Color(0xFF2C2F34),
+        ),
+        dialogTheme: DialogTheme(
+          backgroundColor: Color(0xFF2C2F34),
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          contentTextStyle: TextStyle(color: Color(0xFFB0B3B8), fontSize: 16),
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: const Color(0xFF232323),
-          labelStyle: const TextStyle(color: Colors.white),
-          hintStyle: const TextStyle(color: Colors.white70),
+          fillColor: Color(0xFF23272B),
+          labelStyle: TextStyle(color: Color(0xFFB0B3B8)),
+          hintStyle: TextStyle(color: Colors.white38),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide(color: Colors.white24),
@@ -129,69 +71,29 @@ class ThemeProvider with ChangeNotifier {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Colors.brown),
+            borderSide: BorderSide(color: Colors.white),
           ),
         ),
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: const Color(0xFF232323),
-          selectedItemColor: Colors.brown[200],
-          unselectedItemColor: Colors.white70,
-          selectedLabelStyle: const TextStyle(fontSize: 12, color: Colors.white),
-          unselectedLabelStyle: const TextStyle(fontSize: 12, color: Colors.white70),
-          type: BottomNavigationBarType.fixed,
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: Colors.deepPurple,
+          foregroundColor: Colors.white,
         ),
-        dividerTheme: const DividerThemeData(
-          color: Colors.white24,
-          thickness: 1,
-        ),
-        popupMenuTheme: const PopupMenuThemeData(
-          color: Color(0xFF232323),
-          textStyle: TextStyle(color: Colors.white),
-        ),
+        iconTheme: IconThemeData(color: Colors.white70),
+        dividerColor: Colors.white24,
       );
     }
 
     // Giữ nguyên theme sáng mặc định
-    return ThemeData.light().copyWith(
+    return lightTheme.copyWith(
       primaryColor: Colors.brown[600],
-      scaffoldBackgroundColor: Color(0xFFF5F5F5),
+      scaffoldBackgroundColor: Colors.white,
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.brown[600],
         foregroundColor: Colors.white,
-        titleTextStyle: TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      textTheme: TextTheme(
-        bodyLarge: TextStyle(
-          color: Color(0xFF2C2C2C),
-          fontSize: 16,
-        ),
-        bodyMedium: TextStyle(
-          color: Color(0xFF4A4A4A),
-          fontSize: 14,
-        ),
-        titleLarge: TextStyle(
-          color: Color(0xFF1E1E1E),
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-        titleMedium: TextStyle(
-          color: Color(0xFF2C2C2C),
-          fontSize: 16,
-        ),
       ),
       cardTheme: CardTheme(
         color: Colors.white,
         elevation: 2,
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.brown[600],
-          foregroundColor: Colors.white,
-        ),
       ),
     );
   }
