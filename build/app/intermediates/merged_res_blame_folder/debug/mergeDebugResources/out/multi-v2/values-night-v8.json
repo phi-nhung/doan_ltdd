@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "D:\\LapTrinhDiDong\\demo_ltdd\\android\\app\\src\\main\\res\\values-night\\styles.xml",
+                    "source": "D:\\demo_ltdd\\android\\app\\src\\main\\res\\values-night\\styles.xml",
                     "from": {
                         "startLines": "3,14",
                         "startColumns": "4,4",

@@ -1,10 +1,10 @@
-#Sat May 24 13:08:05 ICT 2025
-base.0=D\:\\LapTrinhDiDong\\demo_ltdd\\build\\app\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
-base.1=D\:\\LapTrinhDiDong\\demo_ltdd\\build\\app\\intermediates\\dex\\debug\\mergeLibDexDebug\\0\\classes.dex
-base.2=D\:\\LapTrinhDiDong\\demo_ltdd\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
-base.3=D\:\\LapTrinhDiDong\\demo_ltdd\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\13\\classes.dex
-base.4=D\:\\LapTrinhDiDong\\demo_ltdd\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\1\\classes.dex
-base.5=D\:\\LapTrinhDiDong\\demo_ltdd\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\7\\classes.dex
+#Sat May 24 14:44:32 ICT 2025
+base.0=D\:\\demo_ltdd\\build\\app\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
+base.1=D\:\\demo_ltdd\\build\\app\\intermediates\\dex\\debug\\mergeLibDexDebug\\0\\classes.dex
+base.2=D\:\\demo_ltdd\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
+base.3=D\:\\demo_ltdd\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\13\\classes.dex
+base.4=D\:\\demo_ltdd\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\1\\classes.dex
+base.5=D\:\\demo_ltdd\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\7\\classes.dex
 path.0=classes.dex
 path.1=0/classes.dex
 path.2=0/classes.dex
