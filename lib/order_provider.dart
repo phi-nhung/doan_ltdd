@@ -32,7 +32,7 @@ class OrderService {
       LEFT JOIN NHANVIEN nv ON d.MANV = nv.MANHANVIEN
       LEFT JOIN BAN b ON d.MABAN = b.MABAN
       $whereClause
-      ORDER BY MAHD ASC
+      ORDER BY MAHD DESC
     ''', whereArgs);
 
     return result.map((row) => Order.fromMap(row)).toList();
@@ -52,6 +52,7 @@ class OrderService {
         LEFT JOIN NHANVIEN nv ON d.MANV = nv.MANHANVIEN
         LEFT JOIN BAN b ON d.MABAN = b.MABAN
         WHERE d.MAHD = ?
+        order by d.MAHD  desc
       ''', [id]);
 
       if (result.isNotEmpty) {
