@@ -1,6 +1,6 @@
 import 'package:doan/database_helper.dart';
 import 'package:doan/model/oder.dart';
-
+import 'package:doan/model/orderItem.dart';
 class OrderService {
   final String _tableName = 'HOADON';
   final String _idColumn = 'MAHD';
@@ -28,27 +28,66 @@ class OrderService {
              nv.HOTEN AS HOTENNHANVIEN,
              b.SOBAN
       FROM HOADON d
-      LEFT JOIN KHACHHANG k ON d.MAKH = k.MAKH -- Đã sửa: Thay đổi thành LEFT JOIN
+      LEFT JOIN KHACHHANG k ON d.MAKH = k.MAKH
       LEFT JOIN NHANVIEN nv ON d.MANV = nv.MANHANVIEN
       LEFT JOIN BAN b ON d.MABAN = b.MABAN
       $whereClause
-      ORDER BY MAHD DESC
+      ORDER BY MAHD ASC
     ''', whereArgs);
 
     return result.map((row) => Order.fromMap(row)).toList();
   }
 
-
   Future<Order?> fetchOrderById(int id) async {
+    final db = await DatabaseHelper.database;
     try {
-      final Map<String, dynamic>? result = await DatabaseHelper.getById(_tableName, id, idColumn: _idColumn);
-      if (result != null) {
-        return Order.fromMap(result);
+      final result = await db.rawQuery('''
+        SELECT d.*,
+               k.HOTEN ,
+               k.SDT ,
+               nv.HOTEN AS HOTENNHANVIEN,
+               b.SOBAN
+        FROM HOADON d
+        LEFT JOIN KHACHHANG k ON d.MAKH = k.MAKH
+        LEFT JOIN NHANVIEN nv ON d.MANV = nv.MANHANVIEN
+        LEFT JOIN BAN b ON d.MABAN = b.MABAN
+        WHERE d.MAHD = ?
+      ''', [id]);
+
+      if (result.isNotEmpty) {
+        print('DEBUG: fetchOrderById - Order data: ${result.first}');
+        return Order.fromMap(result.first);
       }
+      print('DEBUG: fetchOrderById - No order found for ID: $id');
       return null;
     } catch (e) {
       print('Lỗi khi lấy chi tiết đơn hàng: $e');
       return null;
+    }
+  }
+
+  Future<List<OrderItem>> fetchOrderItems(int orderId) async {
+    final db = await DatabaseHelper.database;
+    try {
+      final result = await db.rawQuery('''
+        SELECT ci.*,
+               mh.TENSANPHAM,
+               mh.GIABAN AS DONGIA,
+               mh.HINHANH
+        FROM CHITIETHOADON ci
+        JOIN SANPHAM mh ON ci.MASP = mh.MASANPHAM
+        WHERE ci.MAHD = ?
+      ''', [orderId]);
+
+      print('DEBUG: fetchOrderItems - Order ID: $orderId, Items found: ${result.length}');
+      if (result.isNotEmpty) {
+        print('DEBUG: fetchOrderItems - First item data: ${result.first}');
+      }
+      return result.map((row) => OrderItem.fromMap(row)).toList();
+    } catch (e) {
+      print('Lỗi khi lấy danh sách sản phẩm của đơn hàng: $e');
+      print('SQL Error: $e'); // Thêm dòng này để thấy lỗi SQL cụ thể
+      return [];
     }
   }
 

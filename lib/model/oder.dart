@@ -9,7 +9,7 @@ class Order {
   final int makh;
   final int? manv;
   final int? maban;
-  final String? sdt;
+  final String? sdt; // Đây là SDT của khách hàng
 
   final String? tenKhachHang;
   final String? hoTenNhanVien;
@@ -40,7 +40,8 @@ class Order {
       'MAKH': makh,
       'MANV': manv,
       'MABAN': maban,
-      'SDT': sdt,
+      // SDT không phải là cột trực tiếp của HOADON, nó là từ JOIN
+      // 'SDT': sdt,
     };
   }
 
@@ -50,14 +51,14 @@ class Order {
       ngaytao: DateTime.parse(map['NGAYTAO'] as String),
       tongtien: (map['TONGTIEN'] as num?)?.toDouble() ?? 0.0,
       diemcong: map['DIEMCONG'] as int? ?? 0,
-      hinhthucmua: map['HINHTHUCCHITIET'] as String? ?? '',
+      hinhthucmua: map['HINHTHUCMUA'] as String? ?? '',
       makh: map['MAKH'] as int? ?? -1,
       manv: map['MANV'] as int?,
       maban: map['MABAN'] as int?,
-      tenKhachHang: map['TENKHACHHANG'] as String?,
+      tenKhachHang: map['HOTEN'] as String?,
       hoTenNhanVien: map['HOTENNHANVIEN'] as String?,
       soBan: map['SOBAN'] as int?,
-      sdt: map['SDT'] as String?,
+      sdt: map['SDT'] as String?, // Lấy từ alias SDTKH trong truy vấn SQL
     );
   }
 }

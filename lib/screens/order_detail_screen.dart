@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:doan/model/oder.dart';
-import 'package:intl/intl.dart';
+import 'package:doan/model/orderItem.dart';
 import 'package:doan/order_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:doan/model/oder.dart'; // New OrderItem model
+import 'package:intl/intl.dart';
 
 class OrderDetailScreen extends StatelessWidget {
   final int orderId;
@@ -14,33 +15,125 @@ class OrderDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Chi tiết đơn hàng #${orderId}'),
+        backgroundColor: const Color.fromARGB(255, 107, 66, 38), // Nâu mocha
+        foregroundColor: Colors.white,
       ),
-      body: FutureBuilder<Order?>(
-        future: _orderService.fetchOrderById(orderId),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: Future.wait([
+          _orderService.fetchOrderById(orderId),
+          _orderService.fetchOrderItems(orderId),
+        ]).then((results) {
+          return {
+            'order': results[0] as Order?,
+            'items': results[1] as List<OrderItem>,
+          };
+        }),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Đã xảy ra lỗi: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data == null) {
+          } else if (!snapshot.hasData || snapshot.data!['order'] == null) {
             return Center(child: Text('Không tìm thấy đơn hàng.'));
           } else {
-            final order = snapshot.data!;
-            return Padding(
+            final order = snapshot.data!['order'] as Order;
+            final orderItems = snapshot.data!['items'] as List<OrderItem>;
+
+            // Xác định tên khách hàng hiển thị
+            String customerDisplayName = 'Khách vãng lai';
+            if (order.tenKhachHang != null && order.tenKhachHang!.isNotEmpty) {
+              customerDisplayName = order.tenKhachHang!;
+              if (order.sdt != null && order.sdt!.isNotEmpty) {
+                customerDisplayName += ' - ${order.sdt!}';
+              }
+            }
+
+            return SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text('Mã đơn hàng: ${order.mahd}', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 16),
-                  Text('Mã khách hàng: ${order.makh}'),
-                  Text('Ngày tạo: ${DateFormat('dd/MM/yyyy HH:mm').format(order.ngaytao)}'),
-                  Text('Tổng tiền: ${NumberFormat('#,##0').format(order.tongtien)}đ'),
-                  Text('Hình thức mua: ${order.hinhthucmua}'),
-                  Text('Điểm cộng: ${order.diemcong}'),
-                  if (order.manv != null) Text('Mã nhân viên: ${order.manv}'),
-                  if (order.maban != null) Text('Mã bàn: ${order.maban}'),
-                  // Thêm thông tin chi tiết khác nếu cần
+                  Text(
+                    'Mã đơn hàng: ${order.mahd ?? 'N/A'}',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.brown[800]),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'Ngày lập: ${DateFormat('dd/MM/yyyy HH:mm').format(order.ngaytao)}',
+                    style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    'Nhân viên lập: ${order.hoTenNhanVien ?? 'N/A'}',
+                    style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    'Khách hàng: $customerDisplayName',
+                    style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                  ),
+                  SizedBox(height: 5),
+                  if (order.maban != null)
+                    Text(
+                      'Bàn: ${order.maban}',
+                      style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                    ),
+                  SizedBox(height: 20),
+
+                  Text(
+                    'Danh sách sản phẩm:',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.brown[800]),
+                  ),
+                  SizedBox(height: 10),
+                  // Header cho danh sách sản phẩm
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.brown[100],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(flex: 4, child: Text('Tên món', style: TextStyle(fontWeight: FontWeight.bold))),
+                        Expanded(flex: 2, child: Text('SL', style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
+                        Expanded(flex: 3, child: Text('Đơn giá', style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.right)),
+                        Expanded(flex: 3, child: Text('Thành tiền', style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.right)),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 8),
+
+                  // Danh sách các món hàng
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: orderItems.length,
+                    itemBuilder: (context, index) {
+                      final item = orderItems[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
+                        child: Row(
+                          children: [
+                            Expanded(flex: 4, child: Text(item.tenMonAn)),
+                            Expanded(flex: 2, child: Text('${item.soLuong}', textAlign: TextAlign.center)),
+                            Expanded(flex: 3, child: Text('${NumberFormat('#,##0').format(item.donGia)}đ', textAlign: TextAlign.right)),
+                            Expanded(flex: 3, child: Text('${NumberFormat('#,##0').format(item.soLuong * item.donGia)}đ', textAlign: TextAlign.right)),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  Divider(height: 30, thickness: 2, color: Colors.brown[300]),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Tổng tiền hóa đơn:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.brown[800])),
+                      Text('${NumberFormat('#,##0').format(order.tongtien)}đ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.brown)),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Text('Hình thức mua: ${order.hinhthucmua}', style: TextStyle(fontSize: 16, color: Colors.grey[700])),
+                  Text('Điểm cộng: ${order.diemcong}', style: TextStyle(fontSize: 16, color: Colors.grey[700])),
                 ],
               ),
             );
