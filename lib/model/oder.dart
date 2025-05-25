@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class Order {
   final int? mahd;
   final DateTime ngaytao;
@@ -7,9 +9,8 @@ class Order {
   final int makh;
   final int? manv;
   final int? maban;
-  final String? sdt;
+  final String? sdt; // Đây là SDT của khách hàng
 
-  // Thông tin bổ sung từ khóa ngoại
   final String? tenKhachHang;
   final String? hoTenNhanVien;
   final int? soBan;
@@ -29,7 +30,6 @@ class Order {
     this.sdt,
   });
 
-
   Map<String, dynamic> toMap() {
     return {
       'MAHD': mahd,
@@ -40,24 +40,25 @@ class Order {
       'MAKH': makh,
       'MANV': manv,
       'MABAN': maban,
-      'SDT':sdt,
+      // SDT không phải là cột trực tiếp của HOADON, nó là từ JOIN
+      // 'SDT': sdt,
     };
   }
 
   factory Order.fromMap(Map<String, dynamic> map) {
     return Order(
-      mahd: map['MAHD'],
-      ngaytao: DateTime.parse(map['NGAYTAO']),
-      tongtien: map['TONGTIEN']?.toDouble() ?? 0.0,
-      diemcong: map['DIEMCONG'],
-      hinhthucmua: map['HINHTHUCMUA'],
-      makh: map['MAKH'],
-      manv: map['MANV'],
-      maban: map['MABAN'],
-      tenKhachHang: map['TENKHACHHANG'],
-      hoTenNhanVien: map['HOTENNHANVIEN'],
-      soBan: map['SOBAN'],
-      sdt:map['SDT']
+      mahd: map['MAHD'] as int?,
+      ngaytao: DateTime.parse(map['NGAYTAO'] as String),
+      tongtien: (map['TONGTIEN'] as num?)?.toDouble() ?? 0.0,
+      diemcong: map['DIEMCONG'] as int? ?? 0,
+      hinhthucmua: map['HINHTHUCMUA'] as String? ?? '',
+      makh: map['MAKH'] as int? ?? -1,
+      manv: map['MANV'] as int?,
+      maban: map['MABAN'] as int?,
+      tenKhachHang: map['HOTEN'] as String?,
+      hoTenNhanVien: map['HOTENNHANVIEN'] as String?,
+      soBan: map['SOBAN'] as int?,
+      sdt: map['SDT'] as String?, // Lấy từ alias SDTKH trong truy vấn SQL
     );
   }
 }

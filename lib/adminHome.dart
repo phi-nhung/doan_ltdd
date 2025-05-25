@@ -10,6 +10,7 @@ import 'package:doan/quanlykhachhang.dart';
 import 'package:doan/screens/CreateEmployeeAccountScreen.dart';
 import 'package:doan/screens/order_list_screen.dart';
 import 'package:doan/screens/order_screen.dart';
+import 'package:doan/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';

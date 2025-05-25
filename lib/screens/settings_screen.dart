@@ -14,8 +14,8 @@ class SettingsScreen extends StatelessWidget {
       builder: (context, localeProvider, child) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(AppLocalizations.get(context, 'settings')),
-            backgroundColor: Theme.of(context).primaryColor,
+            title: Text(AppLocalizations.get(context, 'settings'),style: TextStyle(color: Colors.white),),
+            backgroundColor: Color.fromARGB(255, 107, 66, 38),
           ),
           body: Consumer<ThemeProvider>(
             builder: (context, themeProvider, child) => ListView(

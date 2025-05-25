@@ -244,7 +244,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           );
           
           widget.onCheckout();
-          Navigator.of(context).pop();
+          Navigator.pop(context, true);
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Lỗi: ${e.toString()}')),

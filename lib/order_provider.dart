@@ -1,55 +1,94 @@
 import 'package:doan/database_helper.dart';
 import 'package:doan/model/oder.dart';
-
+import 'package:doan/model/orderItem.dart';
 class OrderService {
-  final String _tableName = 'HOADON'; // Đảm bảo tên bảng là 'orders' hoặc tên bảng hóa đơn của bạn
-  final String _idColumn = 'MAHD'; // Tên cột ID trong bảng
+  final String _tableName = 'HOADON';
+  final String _idColumn = 'MAHD';
 
-Future<List<Order>> fetchOrders({String? searchType, String? keyword}) async {
-  final db = await DatabaseHelper.database;
+  Future<List<Order>> fetchOrders({String? searchType, String? keyword}) async {
+    final db = await DatabaseHelper.database;
 
-  String whereClause = '';
-  List<String> whereArgs = [];
+    String whereClause = '';
+    List<dynamic> whereArgs = [];
 
-  if (keyword != null && keyword.isNotEmpty) {
-    if (searchType == 'Mã hóa đơn') {
-      whereClause = 'WHERE d.MAHD = ?';
-      whereArgs.add(keyword);
-    } else if (searchType == 'Số điện thoại') {
-      whereClause = 'WHERE k.SDT = ?';
-      whereArgs.add(keyword);
+    if (keyword != null && keyword.isNotEmpty) {
+      if (searchType == 'Mã hóa đơn') {
+        whereClause = 'WHERE d.MAHD = ?';
+        whereArgs.add(int.tryParse(keyword) ?? -1);
+      } else if (searchType == 'Số điện thoại') {
+        whereClause = 'WHERE k.SDT = ?';
+        whereArgs.add(keyword);
+      }
     }
+
+    final result = await db.rawQuery('''
+      SELECT d.*,
+             k.HOTEN AS TENKHACHHANG,
+             k.SDT AS SDTKH,
+             nv.HOTEN AS HOTENNHANVIEN,
+             b.SOBAN
+      FROM HOADON d
+      LEFT JOIN KHACHHANG k ON d.MAKH = k.MAKH
+      LEFT JOIN NHANVIEN nv ON d.MANV = nv.MANHANVIEN
+      LEFT JOIN BAN b ON d.MABAN = b.MABAN
+      $whereClause
+      ORDER BY MAHD DESC
+    ''', whereArgs);
+
+    return result.map((row) => Order.fromMap(row)).toList();
   }
 
-  final result = await db.rawQuery('''
-    SELECT d.*,
-           k.HOTEN AS TENKHACHHANG,
-           k.SDT AS SDTKH,
-           nv.HOTEN AS HOTENNHANVIEN,
-           b.SOBAN
-    FROM HOADON d
-    JOIN KHACHHANG k ON d.MAKH = k.MAKH
-    LEFT JOIN NHANVIEN nv ON d.MANV = nv.MANHANVIEN
-    LEFT JOIN BAN b ON d.MABAN = b.MABAN
-    ORDER BY ABS(strftime('%s', d.NGAYTAO) - strftime('%s', 'now')) ASC;
-    $whereClause
-  ''', whereArgs);
-
-  return result.map((row) => Order.fromMap(row)).toList();
-}
-
-
-
   Future<Order?> fetchOrderById(int id) async {
+    final db = await DatabaseHelper.database;
     try {
-      final Map<String, dynamic>? result = await DatabaseHelper.getById(_tableName, id, idColumn: _idColumn);
-      if (result != null) {
-        return Order.fromMap(result);
+      final result = await db.rawQuery('''
+        SELECT d.*,
+               k.HOTEN ,
+               k.SDT ,
+               nv.HOTEN AS HOTENNHANVIEN,
+               b.SOBAN
+        FROM HOADON d
+        LEFT JOIN KHACHHANG k ON d.MAKH = k.MAKH
+        LEFT JOIN NHANVIEN nv ON d.MANV = nv.MANHANVIEN
+        LEFT JOIN BAN b ON d.MABAN = b.MABAN
+        WHERE d.MAHD = ?
+        order by d.MAHD  desc
+      ''', [id]);
+
+      if (result.isNotEmpty) {
+        print('DEBUG: fetchOrderById - Order data: ${result.first}');
+        return Order.fromMap(result.first);
       }
+      print('DEBUG: fetchOrderById - No order found for ID: $id');
       return null;
     } catch (e) {
       print('Lỗi khi lấy chi tiết đơn hàng: $e');
       return null;
+    }
+  }
+
+  Future<List<OrderItem>> fetchOrderItems(int orderId) async {
+    final db = await DatabaseHelper.database;
+    try {
+      final result = await db.rawQuery('''
+        SELECT ci.*,
+               mh.TENSANPHAM,
+               mh.GIABAN AS DONGIA,
+               mh.HINHANH
+        FROM CHITIETHOADON ci
+        JOIN SANPHAM mh ON ci.MASP = mh.MASANPHAM
+        WHERE ci.MAHD = ?
+      ''', [orderId]);
+
+      print('DEBUG: fetchOrderItems - Order ID: $orderId, Items found: ${result.length}');
+      if (result.isNotEmpty) {
+        print('DEBUG: fetchOrderItems - First item data: ${result.first}');
+      }
+      return result.map((row) => OrderItem.fromMap(row)).toList();
+    } catch (e) {
+      print('Lỗi khi lấy danh sách sản phẩm của đơn hàng: $e');
+      print('SQL Error: $e'); // Thêm dòng này để thấy lỗi SQL cụ thể
+      return [];
     }
   }
 
