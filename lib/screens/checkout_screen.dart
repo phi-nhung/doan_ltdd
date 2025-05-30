@@ -244,6 +244,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           );
           
           widget.onCheckout();
+          showAboutDialog(context: context, 
+            applicationName: 'Thanh toán thành công',
+            applicationVersion: '1.0.0',
+            children: [
+              Text('Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!'),
+            ],
+          );
           Navigator.pop(context, true);
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(

@@ -13,7 +13,9 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
@@ -31,6 +33,9 @@
             <data android:mimeType="text/plain" />
         </intent>
     </queries>
+
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
     <permission
         android:name="phinhung.come.doan.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
@@ -101,6 +106,16 @@
                 android:value="" />
         </service>
 
+        <provider
+            android:name="com.crazecoder.openfile.FileProvider"
+            android:authorities="phinhung.come.doan.fileProvider.com.crazecoder.openfile"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
+
         <uses-library
             android:name="androidx.window.extensions"
             android:required="false" />
@@ -112,6 +127,9 @@
             android:name="androidx.startup.InitializationProvider"
             android:authorities="phinhung.come.doan.androidx-startup"
             android:exported="false" >
+            <meta-data
+                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+                android:value="androidx.startup" />
             <meta-data
                 android:name="androidx.lifecycle.ProcessLifecycleInitializer"
                 android:value="androidx.startup" />

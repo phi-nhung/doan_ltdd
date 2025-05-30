@@ -148,18 +148,22 @@ class AdminHome extends StatelessWidget {
         child: Card(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 4,
-          child: Column(
-            children: [
-              Icon(icon, size: 40, color: Colors.brown),
-              const SizedBox(height: 10),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16, 
-                  fontWeight: FontWeight.bold
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(icon, size: 40, color: Colors.brown),
+                const SizedBox(height: 10),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16, 
+                    fontWeight: FontWeight.bold
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

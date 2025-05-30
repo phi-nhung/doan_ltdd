@@ -38,7 +38,7 @@ class _CreateEmployeeAccountScreenState extends State<CreateEmployeeAccountScree
           'Cấp Tài khoản Nhân viên',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: const Color.fromARGB(255, 107, 66, 38), // Nâu mocha
+        backgroundColor: Colors.brown
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -113,7 +113,7 @@ class _CreateEmployeeAccountScreenState extends State<CreateEmployeeAccountScree
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 107, 66, 38), // Nâu mocha
+                    backgroundColor: Colors.brown, // Nâu mocha
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),

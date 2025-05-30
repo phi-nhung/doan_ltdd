@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:doan/login.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(
@@ -36,10 +37,9 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           home: LoginScreen(),
+
           theme: baseTheme.copyWith(
-            textTheme: baseTheme.textTheme.apply(
-              fontFamily: fontProvider.currentFont,
-            ),
+            textTheme: GoogleFonts.robotoTextTheme(baseTheme.textTheme),
           ),
           locale: localeProvider.locale,
           supportedLocales: const [

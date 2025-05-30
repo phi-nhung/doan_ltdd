@@ -47,6 +47,46 @@ class AccountProvider extends ChangeNotifier {
     }
   }
 
+  void changePassword({
+    required String oldPassword,
+    required String newPassword,
+    required Function(String) showError,
+    required Function(String) showSuccess,
+  }) async {
+    if (_nhanVien == null) {
+      showError("Không tìm thấy nhân viên.");
+      return;
+    }
+
+    final db = await DatabaseHelper.database;
+
+    final result = await db.rawQuery('SELECT * FROM User where manv=?', [_nhanVien!.maNhanVien]);
+    print("Result: $result");
+    if (result.isEmpty) {
+      showError("Tài khoản không tồn tại.");
+      return;
+    }
+
+    final user = result.first;
+    final currentPassword = user['PASSWORD'];
+
+    if (oldPassword != currentPassword) {
+      showError("Mật khẩu hiện tại không đúng. ${_nhanVien!.maNhanVien}/ $currentPassword");
+      return;
+    }
+
+    // Cập nhật mật khẩu mới
+    await db.update(
+      'User',
+      {'password': newPassword},
+      where: 'MANV = ?',
+      whereArgs: [_nhanVien!.maNhanVien],
+    );
+
+    showSuccess("Đổi mật khẩu thành công.");
+  }
+
+
 
   Future<void> updateNhanVienFromControllers(
     String name,

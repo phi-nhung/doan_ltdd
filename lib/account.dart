@@ -29,7 +29,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Consumer<AccountProvider>(
       builder: (context, accountProvider, _) {
-        // Nếu dữ liệu chưa được gán lần nào, thì set từ widget.nhanVien
         if (accountProvider.nhanVien == null) {
           accountProvider.setNhanVien(widget.nhanVien);
           _nameController.text = widget.nhanVien.hoTen;
@@ -130,6 +129,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 10),
+                Center(
+                  child: TextButton(
+                    onPressed: () => _showChangePasswordDialog(context),
+                    child: const Text(
+                      "Đổi mật khẩu",
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 107, 66, 38),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -155,6 +168,78 @@ class _ProfileScreenState extends State<ProfileScreen> {
           borderSide: BorderSide.none,
         ),
       ),
+    );
+  }
+
+  void _showChangePasswordDialog(BuildContext context) {
+    final TextEditingController oldPasswordController = TextEditingController();
+    final TextEditingController newPasswordController = TextEditingController();
+    final TextEditingController confirmPasswordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Đổi mật khẩu"),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(
+                  controller: oldPasswordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: "Mật khẩu hiện tại"),
+                ),
+                TextField(
+                  controller: newPasswordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: "Mật khẩu mới"),
+                ),
+                TextField(
+                  controller: confirmPasswordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: "Xác nhận mật khẩu mới"),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Hủy"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final oldPass = oldPasswordController.text;
+                final newPass = newPasswordController.text;
+                final confirmPass = confirmPasswordController.text;
+
+                if (newPass != confirmPass) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Mật khẩu xác nhận không khớp")),
+                  );
+                  return;
+                }
+
+                Provider.of<AccountProvider>(context, listen: false).changePassword(
+                  oldPassword: oldPass,
+                  newPassword: newPass,
+                  showError: (msg) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(msg)));
+                  },
+                  showSuccess: (msg) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(msg)));
+                  },
+                );
+              },
+              child: const Text("Xác nhận"),
+            ),
+          ],
+        );
+      },
     );
   }
 }
