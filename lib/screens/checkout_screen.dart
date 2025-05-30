@@ -25,6 +25,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   double _discount = 0;
   double _additionalFee = 0;
   Map<String, dynamic>? _customer;  // Add this line to track selected customer
+  bool _applyDiscount = false;
+  int _pointsToDeduct = 0;
 
   // Add this method to show customer search dialog
   Future<void> _showCustomerSearchDialog() async {
@@ -79,7 +81,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   // Tự động áp dụng chiết khấu từ loại khách hàng
                   setState(() {
                     _customer = results.first;
-                    _discount = results.first['CHIETKHAU'] ?? 0;
+                    // Không tự động set _discount, chỉ lưu chiết khấu vào _customer
                   });
                   Navigator.pop(ctx);
                 } else {
@@ -100,7 +102,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     if (result != null) {
       setState(() => _customer = result);
-      setState(() => _discount = 0);
     }
   }
 
@@ -226,8 +227,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             tableNumber: widget.tableNumber,
             manv: nhanVien.maNhanVien,
             tennv: nhanVien.hoTen,
-            customer: _customer,  // Pass the customer info
-            discount: _discount,
+            customer: _customer,
+            discount: _applyDiscount ? _discount : 0,
             additionalFee: _additionalFee,
           );
           
@@ -408,11 +409,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         : cartProvider.totalAmount;
     final points = cartProvider.calculatePoints(totalAmount);
 
-    final chietKhau = _discount > 0
-        ? _discount
-        : (_customer != null && _customer!['CHIETKHAU'] != null && (_customer!['CHIETKHAU'] as num) > 0)
-            ? (_customer!['CHIETKHAU'] as num).toDouble()
-            : 0.0;
+    final chietKhauPercent = (_customer != null && _customer!['CHIETKHAU'] != null)
+      ? ((_customer!['CHIETKHAU'] as num) * 100)
+      : 0.0;
 
     return Scaffold(
       appBar: AppBar(
@@ -514,14 +513,49 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 padding: EdgeInsets.all(16),
                 child: Column(
                   children: [
+                    if (_customer != null && _customer!['CHIETKHAU'] != null && (_customer!['CHIETKHAU'] as num) > 0)
+                      Row(
+                        children: [
+                          Switch(
+                            value: _applyDiscount,
+                            onChanged: (val) async {
+                              setState(() {
+                                _applyDiscount = val;
+                                if (_applyDiscount) {
+                                  _discount = (_customer!['CHIETKHAU'] as num) * 100;
+                                  _pointsToDeduct = cartProvider.calculatePoints(totalAmount).toInt();
+                                } else {
+                                  _discount = 0;
+                                  _pointsToDeduct = 0;
+                                }
+                              });
+                              if (_applyDiscount && _customer != null && _customer!['DIEMTL'] != null) {
+                                // Trừ điểm tích lũy trong DB
+                                int newPoint = (_customer!['DIEMTL'] as int) - _pointsToDeduct;
+                                if (newPoint < 0) newPoint = 0;
+                                await DatabaseHelper.rawUpdate(
+                                  'UPDATE KHACHHANG SET DIEMTL = ? WHERE MAKH = ?',
+                                  [newPoint, _customer!['MAKH']]
+                                );
+                              }
+                            },
+                          ),
+                          Text('Áp dụng chiết khấu thành viên (${chietKhauPercent.round()}%)'),
+                        ],
+                      ),
+                    if (_applyDiscount && _pointsToDeduct > 0)
+                      Text('Đã sử dụng $_pointsToDeduct điểm tích lũy để nhận chiết khấu.'),
                     TextField(
                       decoration: InputDecoration(labelText: 'Giảm giá (%)'),
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
                         setState(() {
                           _discount = double.tryParse(value) ?? 0;
+                          if (_discount > 0) _applyDiscount = true;
+                          if (_discount == 0) _applyDiscount = false;
                         });
                       },
+                      controller: TextEditingController(text: _discount > 0 ? _discount.toString() : ''),
                     ),
                     SizedBox(height: 8),
                     TextField(
@@ -592,7 +626,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Điểm tích lũy:'),
-                        Text('+$points điểm', style: TextStyle(color: Colors.green)),
+                        Text(_discount > 0 ? '-$_pointsToDeduct điểm' : '+$points điểm', style: TextStyle(color: Colors.green)),
                       ],
                     ),
                   ],

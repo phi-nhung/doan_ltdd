@@ -107,7 +107,7 @@ class CartProvider with ChangeNotifier {
 
   Future<void> saveOrder({
     required List<CartItem> items,
-    required double totalAmount, 
+    required double totalAmount,
     required String paymentMethod,
     required int? tableNumber,
     required int manv,
@@ -118,7 +118,8 @@ class CartProvider with ChangeNotifier {
   }) async {
     try {
       final now = DateTime.now();
-      final points = (totalAmount / 10000).floor();
+      final points = (discount > 0) ? 0 : (totalAmount / 10000).floor();
+      final pointsToDeduct = (discount > 0) ? (totalAmount / 10000).floor() : 0;
       final finalAmount = totalAmount * (1 - discount / 100) + additionalFee;
       
       // Đặt HINHTHUCMUA đúng theo constraint CHK_HTM
@@ -167,11 +168,20 @@ class CartProvider with ChangeNotifier {
         );
       }
 
-      // Cập nhật điểm tích lũy và trạng thái bàn
-      if (customer != null) {
+      // Nếu dùng chiết khấu thì trừ điểm tích lũy và cập nhật lại loại khách hàng
+      if (customer != null && pointsToDeduct > 0) {
+        final currentPoint = customer['DIEMTL'] ?? 0;
+        final newPoint = (currentPoint - pointsToDeduct) < 0 ? 0 : (currentPoint - pointsToDeduct);
+        // Xác định loại khách hàng mới
+        int newLoaiKH = 1; // mặc định vãng lai
+        if (newPoint >= 100) {
+          // Tìm loại thân thiết
+          final loai = await DatabaseHelper.rawQuery('SELECT MALOAIKH FROM LOAIKHACHHANG WHERE DIEMTITOITHIEU <= ? ORDER BY DIEMTITOITHIEU DESC LIMIT 1', [newPoint]);
+          if (loai.isNotEmpty) newLoaiKH = loai.first['MALOAIKH'];
+        }
         await DatabaseHelper.rawUpdate(
-          'UPDATE KHACHHANG SET DIEMTL = DIEMTL + ? WHERE MAKH = ?',
-          [points, customer['MAKH']]
+          'UPDATE KHACHHANG SET DIEMTL = ?, MALOAIKH = ? WHERE MAKH = ?',
+          [newPoint, newLoaiKH, customer['MAKH']]
         );
       }
 
