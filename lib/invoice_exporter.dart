@@ -9,19 +9,40 @@ import 'package:open_filex/open_filex.dart';
 import 'package:doan/model/oder.dart'; 
 import 'package:doan/model/orderItem.dart'; 
 import 'package:doan/order_provider.dart'; 
-import 'package:google_fonts/google_fonts.dart';
 
 class InvoiceExporter {
   final OrderService _orderService = OrderService();
 
+  static pw.Font? _vietnameseFontRegular;
+  static pw.Font? _vietnameseFontBold;
+
+  Future<void> _loadFonts() async {
+    if (_vietnameseFontRegular == null || _vietnameseFontBold == null) {
+      try {
+        final fontData = await rootBundle.load('assets/fonts/Roboto-Regular.ttf');
+        _vietnameseFontRegular = pw.Font.ttf(fontData);
+
+        final fontBoldData = await rootBundle.load('assets/fonts/Roboto-Bold.ttf');
+        _vietnameseFontBold = pw.Font.ttf(fontBoldData);
+      } catch (e) {
+        print('Lỗi khi tải phông chữ từ assets: $e');
+        throw Exception('Không thể tải phông chữ cho PDF. Vui lòng kiểm tra assets/fonts và pubspec.yaml.');
+      }
+    }
+  }
+
   Future<void> exportInvoiceToPdf(BuildContext context, int orderId) async {
     try {
-      // 1. Lấy dữ liệu hóa đơn và chi tiết hóa đơn
+      await _loadFonts();
+
+      if (_vietnameseFontRegular == null || _vietnameseFontBold == null) {
+        throw Exception('Phông chữ chưa được tải hoặc bị lỗi.');
+      }
+
       final order = await _orderService.fetchOrderById(orderId);
       final orderItems = await _orderService.fetchOrderItems(orderId);
 
       if (order == null) {
-        // Hiển thị thông báo nếu không tìm thấy hóa đơn
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Không tìm thấy hóa đơn #${orderId}')),
         );
@@ -29,20 +50,16 @@ class InvoiceExporter {
       }
 
       if (orderItems.isEmpty) {
-        // Hiển thị thông báo nếu không có chi tiết sản phẩm
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Hóa đơn #${orderId} không có sản phẩm nào.')),
         );
         return;
       }
 
-      // 2. Tạo tài liệu PDF
       final pdf = pw.Document();
 
-      // Định dạng tiền tệ
       final currencyFormat = NumberFormat('#,##0', 'vi_VN');
 
-      // Xác định tên khách hàng hiển thị
       String customerDisplayName = 'Khách vãng lai';
       if (order.tenKhachHang != null && order.tenKhachHang!.isNotEmpty) {
         customerDisplayName = order.tenKhachHang!;
@@ -51,51 +68,54 @@ class InvoiceExporter {
         }
       }
 
+      // Tạo một ThemeData cơ bản, sau đó gọi copyWith trên nó
+      final baseTheme = pw.ThemeData.base(); // Lấy theme cơ bản
+      
       pdf.addPage(
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
+          theme: baseTheme.copyWith( // <--- SỬA LỖI Ở ĐÂY
+            defaultTextStyle: pw.TextStyle(font: _vietnameseFontRegular, fontSize: 10),
+            // Các thuộc tính khác bạn muốn copyWith
+          ),
           build: (pw.Context context) {
             return [
-              // Tiêu đề hóa đơn
               pw.Center(
                 child: pw.Text(
                   'HÓA ĐƠN THANH TOÁN',
-                  style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
+                  style: pw.TextStyle(font: _vietnameseFontBold, fontSize: 24, fontWeight: pw.FontWeight.bold),
                 ),
               ),
               pw.SizedBox(height: 20),
 
-              // Thông tin cửa hàng/công ty (có thể tùy chỉnh)
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
                   pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
-                      pw.Text('Tên cửa hàng: Coffee Shop ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                      pw.Text('Địa chỉ: 123 Đường ABC, Quận 1, TP.HCM'),
-                      pw.Text('Điện thoại: 0123 456 789'),
+                      pw.Text('Tên cửa hàng: Coffee Shop ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, font: _vietnameseFontBold)),
+                      pw.Text('Địa chỉ: 123 Đường ABC, Quận 1, TP.HCM', style: pw.TextStyle(font: _vietnameseFontRegular)),
+                      pw.Text('Điện thoại: 0123 456 789', style: pw.TextStyle(font: _vietnameseFontRegular)),
                     ],
                   ),
                   pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
-                      pw.Text('Mã hóa đơn: #${order.mahd ?? 'N/A'}', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                      pw.Text('Ngày lập: ${DateFormat('dd/MM/yyyy HH:mm').format(order.ngaytao)}'),
+                      pw.Text('Mã hóa đơn: #${order.mahd ?? 'N/A'}', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, font: _vietnameseFontBold)),
+                      pw.Text('Ngày lập: ${DateFormat('dd/MM/yyyy HH:mm').format(order.ngaytao)}', style: pw.TextStyle(font: _vietnameseFontRegular)),
                     ],
                   ),
                 ],
               ),
               pw.SizedBox(height: 20),
 
-              // Thông tin khách hàng và nhân viên
-              pw.Text('Thông tin khách hàng:', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-              pw.Text('Tên khách hàng: $customerDisplayName'),
-              pw.Text('Nhân viên lập: ${order.hoTenNhanVien ?? 'N/A'}'),
-              if (order.maban != null) pw.Text('Số bàn: ${order.maban}'),
+              pw.Text('Thông tin khách hàng:', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, font: _vietnameseFontBold)),
+              pw.Text('Tên khách hàng: $customerDisplayName', style: pw.TextStyle(font: _vietnameseFontRegular)),
+              pw.Text('Nhân viên lập: ${order.hoTenNhanVien ?? 'N/A'}', style: pw.TextStyle(font: _vietnameseFontRegular)),
+              if (order.maban != null) pw.Text('Số bàn: ${order.maban}', style: pw.TextStyle(font: _vietnameseFontRegular)),
               pw.SizedBox(height: 20),
 
-              // Bảng danh sách sản phẩm
               pw.Table.fromTextArray(
                 headers: ['STT', 'Tên sản phẩm', 'Số lượng', 'Đơn giá', 'Thành tiền'],
                 data: List<List<String>>.generate(
@@ -111,15 +131,16 @@ class InvoiceExporter {
                     ];
                   },
                 ),
+                defaultColumnWidth: const pw.FlexColumnWidth(1.0),
                 border: pw.TableBorder.all(),
-                headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                headerStyle: pw.TextStyle(font: _vietnameseFontBold, fontWeight: pw.FontWeight.bold),
                 headerDecoration: const pw.BoxDecoration(color: PdfColors.grey300),
                 cellAlignment: pw.Alignment.centerLeft,
                 cellPadding: const pw.EdgeInsets.all(5),
+                cellStyle: pw.TextStyle(font: _vietnameseFontRegular),
               ),
               pw.SizedBox(height: 20),
 
-              // Tổng kết hóa đơn
               pw.Align(
                 alignment: pw.Alignment.centerRight,
                 child: pw.Column(
@@ -127,40 +148,38 @@ class InvoiceExporter {
                   children: [
                     pw.Text(
                       'Tổng cộng: ${currencyFormat.format(order.tongtien)}đ',
-                      style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+                      style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, font: _vietnameseFontBold),
                     ),
                     pw.Text(
-                      'Giảm giá: ${currencyFormat.format(0)}đ', // Cần thêm logic giảm giá nếu có
-                      style: pw.TextStyle(fontSize: 14),
+                      'Giảm giá: ${currencyFormat.format(0)}đ',
+                      style: pw.TextStyle(fontSize: 14, font: _vietnameseFontRegular),
                     ),
                     pw.Text(
-                      'Phụ thu: ${currencyFormat.format(0)}đ', // Cần thêm logic phụ thu nếu có
-                      style: pw.TextStyle(fontSize: 14),
+                      'Phụ thu: ${currencyFormat.format(0)}đ',
+                      style: pw.TextStyle(fontSize: 14, font: _vietnameseFontRegular),
                     ),
                     pw.Divider(),
                     pw.Text(
-                      'Thành tiền: ${currencyFormat.format(order.tongtien)}đ', // Tính toán lại nếu có giảm giá/phụ thu
-                      style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.red),
+                      'Thành tiền: ${currencyFormat.format(order.tongtien)}đ',
+                      style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.red, font: _vietnameseFontBold),
                     ),
                     pw.SizedBox(height: 10),
-                    pw.Text('Hình thức mua: ${order.hinhthucmua}'),
-                    pw.Text('Điểm tích lũy: +${order.diemcong} điểm'),
+                    pw.Text('Hình thức mua: ${order.hinhthucmua}', style: pw.TextStyle(font: _vietnameseFontRegular)),
+                    pw.Text('Điểm tích lũy: +${order.diemcong} điểm', style: pw.TextStyle(font: _vietnameseFontRegular)),
                   ],
                 ),
               ),
               pw.SizedBox(height: 30),
-              pw.Text('Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi!', style: pw.TextStyle(fontStyle: pw.FontStyle.italic)),
+              pw.Text('Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi!', style: pw.TextStyle(fontStyle: pw.FontStyle.italic, font: _vietnameseFontRegular)),
             ];
           },
         ),
       );
 
-      // 3. Lưu file PDF
       final output = await getTemporaryDirectory();
       final file = File('${output.path}/hoa_don_${order.mahd}.pdf');
       await file.writeAsBytes(await pdf.save());
 
-      // 4. Mở file PDF
       OpenFilex.open(file.path);
 
       ScaffoldMessenger.of(context).showSnackBar(

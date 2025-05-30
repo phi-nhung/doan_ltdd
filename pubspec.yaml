@@ -99,6 +99,10 @@ flutter:
     - family: Poppins
       fonts:
         - asset: assets/fonts/Poppins-Italic.ttf
+    - family: Roboto 
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf 
+        - asset: assets/fonts/Roboto-Bold.ttf
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
