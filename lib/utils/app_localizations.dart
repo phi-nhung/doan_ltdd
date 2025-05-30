@@ -8,7 +8,7 @@ class AppLocalizations {
     final _localizedValues = {
       'vi': {
         // App Name
-        'app_name': 'KIOT',
+        'app_name': 'SERO',
         
         // Dashboard Items
         'sell': 'Bán hàng',
