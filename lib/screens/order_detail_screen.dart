@@ -1,43 +1,35 @@
 import 'package:doan/invoice_exporter.dart';
 import 'package:doan/model/orderItem.dart';
-// Đổi import này thành tên file chứa OrderService của bạn, ví dụ:
-// import 'package:doan/order_service.dart';
-import 'package:doan/order_provider.dart'; // <--- Dựa vào tên file của bạn, có thể là order_service.dart
+import 'package:doan/order_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:doan/model/oder.dart'; // New Order model (tên file là 'oder.dart' có thể là lỗi chính tả, nên là 'order.dart')
-import 'package:intl/intl.dart'; // Import InvoiceExporter
+import 'package:doan/model/oder.dart';
+import 'package:intl/intl.dart';
 
 class OrderDetailScreen extends StatelessWidget {
   final int orderId;
-  // Đảm bảo OrderService được khởi tạo đúng cách
   final OrderService _orderService = OrderService();
 
-  OrderDetailScreen({super.key, required this.orderId}); // Thêm key nếu cần
+  OrderDetailScreen({super.key, required this.orderId});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chi tiết đơn hàng #${orderId}'),
-        backgroundColor: const Color.fromARGB(255, 107, 66, 38), // Nâu mocha
+        title: Text('Chi tiết đơn hàng #$orderId'),
+        backgroundColor: const Color.fromARGB(255, 107, 66, 38),
         foregroundColor: Colors.white,
         actions: [
-          // --- THÊM NÚT IN HÓA ĐƠN VÀO ĐÂY ---
           IconButton(
             icon: const Icon(Icons.print),
             tooltip: 'In hóa đơn',
             onPressed: () async {
-              // Khởi tạo InvoiceExporter
               final InvoiceExporter exporter = InvoiceExporter();
               try {
-                // Gọi hàm xuất hóa đơn, truyền context và orderId
                 await exporter.exportInvoiceToPdf(context, orderId);
-                // Hiển thị thông báo thành công (tùy chọn)
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Đang tạo và mở hóa đơn PDF...')),
                 );
               } catch (e) {
-                // Xử lý lỗi nếu có
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Lỗi khi in hóa đơn: ${e.toString()}')),
                 );
@@ -52,7 +44,7 @@ class OrderDetailScreen extends StatelessWidget {
           _orderService.fetchOrderItems(orderId),
         ]).then((results) {
           return {
-            'order': results[0] as Order?, // Đảm bảo kiểu trả về khớp với fetchOrderById
+            'order': results[0] as Order?,
             'items': results[1] as List<OrderItem>,
           };
         }),
@@ -67,7 +59,9 @@ class OrderDetailScreen extends StatelessWidget {
             final order = snapshot.data!['order'] as Order;
             final orderItems = snapshot.data!['items'] as List<OrderItem>;
 
-            // Xác định tên khách hàng hiển thị
+            final int tongTienGoc = orderItems.fold(0, (sum, item) => sum + (item.soLuong * item.donGia).toInt());
+            final double giamGia = tongTienGoc - order.tongtien;
+
             String customerDisplayName = 'Khách vãng lai';
             if (order.tenKhachHang != null && order.tenKhachHang!.isNotEmpty) {
               customerDisplayName = order.tenKhachHang!;
@@ -113,7 +107,6 @@ class OrderDetailScreen extends StatelessWidget {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.brown[800]),
                   ),
                   const SizedBox(height: 10),
-                  // Header cho danh sách sản phẩm
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                     decoration: BoxDecoration(
@@ -131,7 +124,6 @@ class OrderDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
 
-                  // Danh sách các món hàng
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -151,7 +143,25 @@ class OrderDetailScreen extends StatelessWidget {
                       );
                     },
                   ),
+
                   Divider(height: 30, thickness: 2, color: Colors.brown[300]),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Tổng tiền món ăn:', style: TextStyle(fontSize: 16, color: Colors.grey[700])),
+                      Text('${NumberFormat('#,##0').format(tongTienGoc)}đ', style: TextStyle(fontSize: 16, color: Colors.grey[700])),
+                    ],
+                  ),
+                  if (giamGia > 0)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Giảm giá:', style: TextStyle(fontSize: 16, color: Colors.red[700])),
+                        Text('-${NumberFormat('#,##0').format(giamGia)}đ', style: TextStyle(fontSize: 16, color: Colors.red[700])),
+                      ],
+                    ),
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
