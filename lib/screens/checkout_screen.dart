@@ -5,6 +5,7 @@ import '../provider/cart_provider.dart';
 import '../provider/account_provider.dart';
 import '../model/cart_item.dart';
 import 'package:intl/intl.dart';
+import '../invoice_exporter.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final int? tableNumber;
@@ -220,7 +221,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ? cartProvider.tableItems[widget.tableNumber] ?? []
               : items;
 
-          await cartProvider.saveOrder(
+          // Lưu hóa đơn
+          final orderId = await cartProvider.saveOrder(
             items: orderItems,
             totalAmount: totalAmount,
             paymentMethod: _selectedPaymentMethod,
@@ -231,27 +233,55 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             discount: _applyDiscount ? _discount : 0,
             additionalFee: _additionalFee,
           );
-          
+
+          if (orderId == null) {
+            throw Exception('Không thể lưu đơn hàng');
+          }
+
           // Clear the appropriate cart
           if (widget.tableNumber != null) {
             cartProvider.clearTableCart(widget.tableNumber!);
           } else {
             cartProvider.clearCart();
           }
-          
+
+          // Hỏi in hóa đơn
+          final printResult = await showDialog<bool>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: Text('In hóa đơn?'),
+              content: Text('Bạn có muốn in hóa đơn không?'),
+              actions: [
+                TextButton(
+                  child: Text('Không'),
+                  onPressed: () => Navigator.pop(ctx, false),
+                ),
+                ElevatedButton(
+                  child: Text('Có'),
+                  onPressed: () => Navigator.pop(ctx, true),
+                ),
+              ],
+            ),
+          );
+
+          if (printResult == true) {
+            try {
+              final exporter = InvoiceExporter();
+              await exporter.exportInvoiceToPdf(context, orderId);
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Lỗi khi in hóa đơn: ${e.toString()}')),
+              );
+            }
+          }
+
+          // Hiển thị thông báo thành công và quay lại trang bán hàng
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Thanh toán thành công')),
           );
-          
           widget.onCheckout();
-          showAboutDialog(context: context, 
-            applicationName: 'Thanh toán thành công',
-            applicationVersion: '1.0.0',
-            children: [
-              Text('Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!'),
-            ],
-          );
           Navigator.pop(context, true);
+
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Lỗi: ${e.toString()}')),
