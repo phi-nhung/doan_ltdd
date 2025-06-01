@@ -32,7 +32,7 @@ class AdminHome extends StatelessWidget {
       );
     }
 
-    final String chucVu = nhanVien.chucVu.toLowerCase();
+    final String chucVu = nhanVien.maCV.toString().toLowerCase();
 
     final List<_DashboardItem> allItems = [
       _DashboardItem(const OrderScreen(), Icons.sell_outlined, 

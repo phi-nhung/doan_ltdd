@@ -13,23 +13,23 @@
 13         to allow setting breakpoints, to provide hot reload, etc.
 14    -->
 15    <uses-permission android:name="android.permission.INTERNET" />
-15-->D:\LapTrinhDiDong\demo_ltdd\android\app\src\debug\AndroidManifest.xml:6:5-66
-15-->D:\LapTrinhDiDong\demo_ltdd\android\app\src\debug\AndroidManifest.xml:6:22-64
+15-->D:\LapTrinhWeb\demo_ltdd\android\app\src\debug\AndroidManifest.xml:6:5-66
+15-->D:\LapTrinhWeb\demo_ltdd\android\app\src\debug\AndroidManifest.xml:6:22-64
 16    <uses-permission
-16-->D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:2:5-79
+16-->D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:2:5-79
 17        android:name="android.permission.READ_EXTERNAL_STORAGE"
-17-->D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:2:22-77
+17-->D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:2:22-77
 18        android:maxSdkVersion="32" />
-18-->[:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:9-35
+18-->[:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:9-35
 19    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-19-->D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:3:5-80
-19-->D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:3:22-78
+19-->D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:3:5-80
+19-->D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:3:22-78
 20    <uses-permission android:name="android.permission.CAMERA" />
-20-->D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:4:5-64
-20-->D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:4:22-62
+20-->D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:4:5-64
+20-->D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:4:22-62
 21    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-21-->D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:5:5-75
-21-->D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:5:22-73
+21-->D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:5:5-75
+21-->D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:5:22-73
 22    <!--
 23 Required to query activities that can process text, see:
 24         https://developer.android.com/training/package-visibility and
@@ -38,25 +38,25 @@
 27         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin.
 28    -->
 29    <queries>
-29-->D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:43:5-48:15
+29-->D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:43:5-48:15
 30        <intent>
-30-->D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:44:9-47:18
+30-->D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:44:9-47:18
 31            <action android:name="android.intent.action.PROCESS_TEXT" />
-31-->D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:45:13-72
-31-->D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:45:21-70
+31-->D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:45:13-72
+31-->D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:45:21-70
 32
 33            <data android:mimeType="text/plain" />
-33-->D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:46:13-50
-33-->D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:46:19-48
+33-->D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:46:13-50
+33-->D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:46:19-48
 34        </intent>
 35    </queries>
 36
 37    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-37-->[:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:5-75
-37-->[:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:22-72
+37-->[:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:5-75
+37-->[:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:22-72
 38    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-38-->[:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:5-75
-38-->[:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:22-72
+38-->[:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:5-75
+38-->[:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:22-72
 39
 40    <permission
 40-->[androidx.core:core:1.13.1] C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\8cf478dec41eed746328fa8046755ba2\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
@@ -112,61 +112,61 @@
 85            android:value="2" />
 86
 87        <provider
-87-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:9-17:20
+87-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:9-17:20
 88            android:name="io.flutter.plugins.imagepicker.ImagePickerFileProvider"
-88-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-82
+88-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-82
 89            android:authorities="phinhung.come.doan.flutter.image_provider"
-89-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-74
+89-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-74
 90            android:exported="false"
-90-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:13-37
+90-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:13-37
 91            android:grantUriPermissions="true" >
-91-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-47
+91-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-47
 92            <meta-data
-92-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-16:75
+92-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-16:75
 93                android:name="android.support.FILE_PROVIDER_PATHS"
-93-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-67
+93-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-67
 94                android:resource="@xml/flutter_image_picker_file_paths" />
-94-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:17-72
+94-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:17-72
 95        </provider> <!-- Trigger Google Play services to install the backported photo picker module. -->
 96        <service
-96-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:19:9-31:19
+96-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:19:9-31:19
 97            android:name="com.google.android.gms.metadata.ModuleDependencies"
-97-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:13-78
+97-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:13-78
 98            android:enabled="false"
-98-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:13-36
+98-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:13-36
 99            android:exported="false" >
-99-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:22:13-37
+99-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:22:13-37
 100            <intent-filter>
-100-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:24:13-26:29
+100-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:24:13-26:29
 101                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
-101-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:17-94
-101-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:25-91
+101-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:17-94
+101-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:25-91
 102            </intent-filter>
 103
 104            <meta-data
-104-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:28:13-30:36
+104-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:28:13-30:36
 105                android:name="photopicker_activity:0:required"
-105-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:29:17-63
+105-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:29:17-63
 106                android:value="" />
-106-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:30:17-33
+106-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:30:17-33
 107        </service>
 108
 109        <provider
-109-->[:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:9-25:20
+109-->[:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:9-25:20
 110            android:name="com.crazecoder.openfile.FileProvider"
-110-->[:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:17:13-64
+110-->[:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:17:13-64
 111            android:authorities="phinhung.come.doan.fileProvider.com.crazecoder.openfile"
-111-->[:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:18:13-88
+111-->[:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:18:13-88
 112            android:exported="false"
-112-->[:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:19:13-37
+112-->[:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:19:13-37
 113            android:grantUriPermissions="true" >
-113-->[:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:13-47
+113-->[:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:13-47
 114            <meta-data
-114-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-16:75
+114-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-16:75
 115                android:name="android.support.FILE_PROVIDER_PATHS"
-115-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-67
+115-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-67
 116                android:resource="@xml/filepaths" />
-116-->[:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:17-72
+116-->[:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:17-72
 117        </provider>
 118
 119        <uses-library

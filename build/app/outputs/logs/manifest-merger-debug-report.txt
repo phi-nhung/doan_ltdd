@@ -1,11 +1,11 @@
 -- Merging decision tree log ---
 application
-INJECTED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:6:5-37:19
-INJECTED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\debug\AndroidManifest.xml
-MERGED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-32:19
-MERGED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-32:19
-MERGED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:5-26:19
-MERGED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:5-26:19
+INJECTED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:6:5-37:19
+INJECTED from D:\LapTrinhWeb\demo_ltdd\android\app\src\debug\AndroidManifest.xml
+MERGED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-32:19
+MERGED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-32:19
+MERGED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:5-26:19
+MERGED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:5-26:19
 MERGED from [androidx.window:window:1.2.0] C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\5093ab42d2307deb2d7ac0b7f5718c38\transformed\jetified-window-1.2.0\AndroidManifest.xml:22:5-29:19
 MERGED from [androidx.window:window:1.2.0] C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\5093ab42d2307deb2d7ac0b7f5718c38\transformed\jetified-window-1.2.0\AndroidManifest.xml:22:5-29:19
 MERGED from [androidx.emoji2:emoji2:1.2.0] C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\d221757f531c672c2df2db4ebaa2cbf1\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:23:5-33:19
@@ -21,24 +21,24 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\CHAU KHOA\.gradle\
 MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\92a2169b5b2674c8bbe10e1b1d80da0f\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:24:5-25:19
 MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\92a2169b5b2674c8bbe10e1b1d80da0f\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:24:5-25:19
 	android:extractNativeLibs
-		INJECTED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\debug\AndroidManifest.xml
+		INJECTED from D:\LapTrinhWeb\demo_ltdd\android\app\src\debug\AndroidManifest.xml
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.13.1] C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\8cf478dec41eed746328fa8046755ba2\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
 	android:name
-		INJECTED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml
+		INJECTED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml
 manifest
-ADDED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:1:1-49:12
-MERGED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:1:1-49:12
-INJECTED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\debug\AndroidManifest.xml:1:1-7:12
-INJECTED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\debug\AndroidManifest.xml:1:1-7:12
-INJECTED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\debug\AndroidManifest.xml:1:1-7:12
-MERGED from [:shared_preferences_android] D:\LapTrinhDiDong\demo_ltdd\build\shared_preferences_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
-MERGED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-34:12
-MERGED from [:flutter_plugin_android_lifecycle] D:\LapTrinhDiDong\demo_ltdd\build\flutter_plugin_android_lifecycle\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
-MERGED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-28:12
-MERGED from [:path_provider_android] D:\LapTrinhDiDong\demo_ltdd\build\path_provider_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
-MERGED from [:permission_handler_android] D:\LapTrinhDiDong\demo_ltdd\build\permission_handler_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
-MERGED from [:sqflite_android] D:\LapTrinhDiDong\demo_ltdd\build\sqflite_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+ADDED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:1:1-49:12
+MERGED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:1:1-49:12
+INJECTED from D:\LapTrinhWeb\demo_ltdd\android\app\src\debug\AndroidManifest.xml:1:1-7:12
+INJECTED from D:\LapTrinhWeb\demo_ltdd\android\app\src\debug\AndroidManifest.xml:1:1-7:12
+INJECTED from D:\LapTrinhWeb\demo_ltdd\android\app\src\debug\AndroidManifest.xml:1:1-7:12
+MERGED from [:shared_preferences_android] D:\LapTrinhWeb\demo_ltdd\build\shared_preferences_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-34:12
+MERGED from [:flutter_plugin_android_lifecycle] D:\LapTrinhWeb\demo_ltdd\build\flutter_plugin_android_lifecycle\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-28:12
+MERGED from [:path_provider_android] D:\LapTrinhWeb\demo_ltdd\build\path_provider_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:permission_handler_android] D:\LapTrinhWeb\demo_ltdd\build\permission_handler_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:sqflite_android] D:\LapTrinhWeb\demo_ltdd\build\sqflite_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.preference:preference:1.2.1] C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\0098a6e93522fecc805d8900172003dc\transformed\preference-1.2.1\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.appcompat:appcompat-resources:1.6.1] C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\a12a090674da1baef97900c09c2e9654\transformed\jetified-appcompat-resources-1.6.1\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.appcompat:appcompat:1.6.1] C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\67e431d42222568371fff0afd22bbdc6\transformed\appcompat-1.6.1\AndroidManifest.xml:17:1-22:12
@@ -95,69 +95,69 @@ MERGED from [androidx.print:print:1.0.0] C:\Users\CHAU KHOA\.gradle\caches\8.10.
 MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\f09a22cdd213028a38958888c7d16e20\transformed\jetified-annotation-experimental-1.4.0\AndroidManifest.xml:2:1-7:12
 MERGED from [com.getkeepsafe.relinker:relinker:1.4.5] C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\9e1412f82216e9a99f9f845f4567c1f2\transformed\jetified-relinker-1.4.5\AndroidManifest.xml:2:1-7:12
 	package
-		INJECTED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\debug\AndroidManifest.xml
+		INJECTED from D:\LapTrinhWeb\demo_ltdd\android\app\src\debug\AndroidManifest.xml
 	android:versionName
-		INJECTED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\debug\AndroidManifest.xml
+		INJECTED from D:\LapTrinhWeb\demo_ltdd\android\app\src\debug\AndroidManifest.xml
 	android:versionCode
-		INJECTED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\debug\AndroidManifest.xml
+		INJECTED from D:\LapTrinhWeb\demo_ltdd\android\app\src\debug\AndroidManifest.xml
 	xmlns:android
-		ADDED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:1:11-69
+		ADDED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:1:11-69
 uses-permission#android.permission.READ_EXTERNAL_STORAGE
-ADDED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:2:5-79
-MERGED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-10:38
-MERGED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-10:38
+ADDED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:2:5-79
+MERGED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-10:38
+MERGED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-10:38
 	android:maxSdkVersion
-		ADDED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:9-35
+		ADDED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:9-35
 	android:name
-		ADDED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:2:22-77
+		ADDED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:2:22-77
 uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
-ADDED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:3:5-80
+ADDED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:3:5-80
 	android:name
-		ADDED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:3:22-78
+		ADDED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:3:22-78
 uses-permission#android.permission.CAMERA
-ADDED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:4:5-64
+ADDED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:4:5-64
 	android:name
-		ADDED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:4:22-62
+		ADDED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:4:22-62
 uses-permission#android.permission.READ_MEDIA_IMAGES
-ADDED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:5:5-75
-MERGED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:5-76
-MERGED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:5-76
+ADDED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:5:5-75
+MERGED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:5-76
+MERGED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:5-76
 	android:name
-		ADDED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:5:22-73
+		ADDED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:5:22-73
 queries
-ADDED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:43:5-48:15
+ADDED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:43:5-48:15
 intent#action:name:android.intent.action.PROCESS_TEXT+data:mimeType:text/plain
-ADDED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:44:9-47:18
+ADDED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:44:9-47:18
 action#android.intent.action.PROCESS_TEXT
-ADDED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:45:13-72
+ADDED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:45:13-72
 	android:name
-		ADDED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:45:21-70
+		ADDED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:45:21-70
 data
-ADDED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:46:13-50
+ADDED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:46:13-50
 	android:mimeType
-		ADDED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\AndroidManifest.xml:46:19-48
+		ADDED from D:\LapTrinhWeb\demo_ltdd\android\app\src\main\AndroidManifest.xml:46:19-48
 uses-permission#android.permission.INTERNET
-ADDED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\debug\AndroidManifest.xml:6:5-66
+ADDED from D:\LapTrinhWeb\demo_ltdd\android\app\src\debug\AndroidManifest.xml:6:5-66
 	android:name
-		ADDED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\debug\AndroidManifest.xml:6:22-64
+		ADDED from D:\LapTrinhWeb\demo_ltdd\android\app\src\debug\AndroidManifest.xml:6:22-64
 uses-sdk
-INJECTED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\debug\AndroidManifest.xml reason: use-sdk injection requested
-INJECTED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\debug\AndroidManifest.xml
-INJECTED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\debug\AndroidManifest.xml
-MERGED from [:shared_preferences_android] D:\LapTrinhDiDong\demo_ltdd\build\shared_preferences_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
-MERGED from [:shared_preferences_android] D:\LapTrinhDiDong\demo_ltdd\build\shared_preferences_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
-MERGED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:6:5-44
-MERGED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:6:5-44
-MERGED from [:flutter_plugin_android_lifecycle] D:\LapTrinhDiDong\demo_ltdd\build\flutter_plugin_android_lifecycle\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
-MERGED from [:flutter_plugin_android_lifecycle] D:\LapTrinhDiDong\demo_ltdd\build\flutter_plugin_android_lifecycle\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
-MERGED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:6:5-44
-MERGED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:6:5-44
-MERGED from [:path_provider_android] D:\LapTrinhDiDong\demo_ltdd\build\path_provider_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
-MERGED from [:path_provider_android] D:\LapTrinhDiDong\demo_ltdd\build\path_provider_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
-MERGED from [:permission_handler_android] D:\LapTrinhDiDong\demo_ltdd\build\permission_handler_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
-MERGED from [:permission_handler_android] D:\LapTrinhDiDong\demo_ltdd\build\permission_handler_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
-MERGED from [:sqflite_android] D:\LapTrinhDiDong\demo_ltdd\build\sqflite_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
-MERGED from [:sqflite_android] D:\LapTrinhDiDong\demo_ltdd\build\sqflite_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+INJECTED from D:\LapTrinhWeb\demo_ltdd\android\app\src\debug\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from D:\LapTrinhWeb\demo_ltdd\android\app\src\debug\AndroidManifest.xml
+INJECTED from D:\LapTrinhWeb\demo_ltdd\android\app\src\debug\AndroidManifest.xml
+MERGED from [:shared_preferences_android] D:\LapTrinhWeb\demo_ltdd\build\shared_preferences_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:shared_preferences_android] D:\LapTrinhWeb\demo_ltdd\build\shared_preferences_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:6:5-44
+MERGED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:6:5-44
+MERGED from [:flutter_plugin_android_lifecycle] D:\LapTrinhWeb\demo_ltdd\build\flutter_plugin_android_lifecycle\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:flutter_plugin_android_lifecycle] D:\LapTrinhWeb\demo_ltdd\build\flutter_plugin_android_lifecycle\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:6:5-44
+MERGED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:6:5-44
+MERGED from [:path_provider_android] D:\LapTrinhWeb\demo_ltdd\build\path_provider_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:path_provider_android] D:\LapTrinhWeb\demo_ltdd\build\path_provider_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:permission_handler_android] D:\LapTrinhWeb\demo_ltdd\build\permission_handler_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:permission_handler_android] D:\LapTrinhWeb\demo_ltdd\build\permission_handler_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:sqflite_android] D:\LapTrinhWeb\demo_ltdd\build\sqflite_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:sqflite_android] D:\LapTrinhWeb\demo_ltdd\build\sqflite_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
 MERGED from [androidx.preference:preference:1.2.1] C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\0098a6e93522fecc805d8900172003dc\transformed\preference-1.2.1\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.preference:preference:1.2.1] C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\0098a6e93522fecc805d8900172003dc\transformed\preference-1.2.1\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.appcompat:appcompat-resources:1.6.1] C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\a12a090674da1baef97900c09c2e9654\transformed\jetified-appcompat-resources-1.6.1\AndroidManifest.xml:20:5-44
@@ -269,67 +269,67 @@ MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\CHAU KH
 MERGED from [com.getkeepsafe.relinker:relinker:1.4.5] C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\9e1412f82216e9a99f9f845f4567c1f2\transformed\jetified-relinker-1.4.5\AndroidManifest.xml:5:5-43
 MERGED from [com.getkeepsafe.relinker:relinker:1.4.5] C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\9e1412f82216e9a99f9f845f4567c1f2\transformed\jetified-relinker-1.4.5\AndroidManifest.xml:5:5-43
 	android:targetSdkVersion
-		INJECTED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\debug\AndroidManifest.xml
+		INJECTED from D:\LapTrinhWeb\demo_ltdd\android\app\src\debug\AndroidManifest.xml
 	android:minSdkVersion
-		INJECTED from D:\LapTrinhDiDong\demo_ltdd\android\app\src\debug\AndroidManifest.xml
+		INJECTED from D:\LapTrinhWeb\demo_ltdd\android\app\src\debug\AndroidManifest.xml
 provider#io.flutter.plugins.imagepicker.ImagePickerFileProvider
-ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:9-17:20
+ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:9-17:20
 	android:grantUriPermissions
-		ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-47
+		ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-47
 	android:authorities
-		ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-74
+		ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-74
 	android:exported
-		ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:13-37
+		ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:13-37
 	android:name
-		ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-82
+		ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-82
 meta-data#android.support.FILE_PROVIDER_PATHS
-ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-16:75
+ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-16:75
 	android:resource
-		ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:17-72
+		ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:17-72
 	android:name
-		ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-67
+		ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-67
 service#com.google.android.gms.metadata.ModuleDependencies
-ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:19:9-31:19
+ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:19:9-31:19
 	android:enabled
-		ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:13-36
+		ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:13-36
 	android:exported
-		ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:22:13-37
+		ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:22:13-37
 	tools:ignore
-		ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:23:13-40
+		ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:23:13-40
 	android:name
-		ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:13-78
+		ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:13-78
 intent-filter#action:name:com.google.android.gms.metadata.MODULE_DEPENDENCIES
-ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:24:13-26:29
+ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:24:13-26:29
 action#com.google.android.gms.metadata.MODULE_DEPENDENCIES
-ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:17-94
+ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:17-94
 	android:name
-		ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:25-91
+		ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:25-91
 meta-data#photopicker_activity:0:required
-ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:28:13-30:36
+ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:28:13-30:36
 	android:value
-		ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:30:17-33
+		ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:30:17-33
 	android:name
-		ADDED from [:image_picker_android] D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:29:17-63
+		ADDED from [:image_picker_android] D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:29:17-63
 uses-permission#android.permission.READ_MEDIA_VIDEO
-ADDED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:5-75
+ADDED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:5-75
 	android:name
-		ADDED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:22-72
+		ADDED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:22-72
 uses-permission#android.permission.READ_MEDIA_AUDIO
-ADDED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:5-75
+ADDED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:5-75
 	android:name
-		ADDED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:22-72
+		ADDED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:22-72
 provider#com.crazecoder.openfile.FileProvider
-ADDED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:9-25:20
+ADDED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:9-25:20
 	android:grantUriPermissions
-		ADDED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:13-47
+		ADDED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:13-47
 	android:authorities
-		ADDED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:18:13-88
+		ADDED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:18:13-88
 	android:exported
-		ADDED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:19:13-37
+		ADDED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:19:13-37
 	tools:replace
-		ADDED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:13-48
+		ADDED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:13-48
 	android:name
-		ADDED from [:open_filex] D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:17:13-64
+		ADDED from [:open_filex] D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:17:13-64
 uses-library#androidx.window.extensions
 ADDED from [androidx.window:window:1.2.0] C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\5093ab42d2307deb2d7ac0b7f5718c38\transformed\jetified-window-1.2.0\AndroidManifest.xml:23:9-25:40
 	android:required

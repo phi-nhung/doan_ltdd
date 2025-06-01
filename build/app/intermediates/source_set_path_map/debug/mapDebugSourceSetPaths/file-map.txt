@@ -35,17 +35,17 @@ phinhung.come.doan.app-jetified-savedstate-ktx-1.2.1-33 C:\Users\CHAU KHOA\.grad
 phinhung.come.doan.app-jetified-lifecycle-livedata-core-ktx-2.7.0-34 C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\ebeb29d7113d60e59d5e0acf92f847f3\transformed\jetified-lifecycle-livedata-core-ktx-2.7.0\res
 phinhung.come.doan.app-jetified-annotation-experimental-1.4.0-35 C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\f09a22cdd213028a38958888c7d16e20\transformed\jetified-annotation-experimental-1.4.0\res
 phinhung.come.doan.app-core-runtime-2.2.0-36 C:\Users\CHAU KHOA\.gradle\caches\8.10.2\transforms\ff849810dfe34a0ab790c402787c149e\transformed\core-runtime-2.2.0\res
-phinhung.come.doan.app-debug-37 D:\LapTrinhDiDong\demo_ltdd\android\app\src\debug\res
-phinhung.come.doan.app-main-38 D:\LapTrinhDiDong\demo_ltdd\android\app\src\main\res
-phinhung.come.doan.app-pngs-39 D:\LapTrinhDiDong\demo_ltdd\build\app\generated\res\pngs\debug
-phinhung.come.doan.app-resValues-40 D:\LapTrinhDiDong\demo_ltdd\build\app\generated\res\resValues\debug
-phinhung.come.doan.app-packageDebugResources-41 D:\LapTrinhDiDong\demo_ltdd\build\app\intermediates\incremental\debug\packageDebugResources\merged.dir
-phinhung.come.doan.app-packageDebugResources-42 D:\LapTrinhDiDong\demo_ltdd\build\app\intermediates\incremental\debug\packageDebugResources\stripped.dir
-phinhung.come.doan.app-debug-43 D:\LapTrinhDiDong\demo_ltdd\build\app\intermediates\merged_res\debug\mergeDebugResources
-phinhung.come.doan.app-debug-44 D:\LapTrinhDiDong\demo_ltdd\build\flutter_plugin_android_lifecycle\intermediates\packaged_res\debug\packageDebugResources
-phinhung.come.doan.app-debug-45 D:\LapTrinhDiDong\demo_ltdd\build\image_picker_android\intermediates\packaged_res\debug\packageDebugResources
-phinhung.come.doan.app-debug-46 D:\LapTrinhDiDong\demo_ltdd\build\open_filex\intermediates\packaged_res\debug\packageDebugResources
-phinhung.come.doan.app-debug-47 D:\LapTrinhDiDong\demo_ltdd\build\path_provider_android\intermediates\packaged_res\debug\packageDebugResources
-phinhung.come.doan.app-debug-48 D:\LapTrinhDiDong\demo_ltdd\build\permission_handler_android\intermediates\packaged_res\debug\packageDebugResources
-phinhung.come.doan.app-debug-49 D:\LapTrinhDiDong\demo_ltdd\build\shared_preferences_android\intermediates\packaged_res\debug\packageDebugResources
-phinhung.come.doan.app-debug-50 D:\LapTrinhDiDong\demo_ltdd\build\sqflite_android\intermediates\packaged_res\debug\packageDebugResources
+phinhung.come.doan.app-debug-37 D:\LapTrinhWeb\demo_ltdd\android\app\src\debug\res
+phinhung.come.doan.app-main-38 D:\LapTrinhWeb\demo_ltdd\android\app\src\main\res
+phinhung.come.doan.app-pngs-39 D:\LapTrinhWeb\demo_ltdd\build\app\generated\res\pngs\debug
+phinhung.come.doan.app-resValues-40 D:\LapTrinhWeb\demo_ltdd\build\app\generated\res\resValues\debug
+phinhung.come.doan.app-packageDebugResources-41 D:\LapTrinhWeb\demo_ltdd\build\app\intermediates\incremental\debug\packageDebugResources\merged.dir
+phinhung.come.doan.app-packageDebugResources-42 D:\LapTrinhWeb\demo_ltdd\build\app\intermediates\incremental\debug\packageDebugResources\stripped.dir
+phinhung.come.doan.app-debug-43 D:\LapTrinhWeb\demo_ltdd\build\app\intermediates\merged_res\debug\mergeDebugResources
+phinhung.come.doan.app-debug-44 D:\LapTrinhWeb\demo_ltdd\build\flutter_plugin_android_lifecycle\intermediates\packaged_res\debug\packageDebugResources
+phinhung.come.doan.app-debug-45 D:\LapTrinhWeb\demo_ltdd\build\image_picker_android\intermediates\packaged_res\debug\packageDebugResources
+phinhung.come.doan.app-debug-46 D:\LapTrinhWeb\demo_ltdd\build\open_filex\intermediates\packaged_res\debug\packageDebugResources
+phinhung.come.doan.app-debug-47 D:\LapTrinhWeb\demo_ltdd\build\path_provider_android\intermediates\packaged_res\debug\packageDebugResources
+phinhung.come.doan.app-debug-48 D:\LapTrinhWeb\demo_ltdd\build\permission_handler_android\intermediates\packaged_res\debug\packageDebugResources
+phinhung.come.doan.app-debug-49 D:\LapTrinhWeb\demo_ltdd\build\shared_preferences_android\intermediates\packaged_res\debug\packageDebugResources
+phinhung.come.doan.app-debug-50 D:\LapTrinhWeb\demo_ltdd\build\sqflite_android\intermediates\packaged_res\debug\packageDebugResources

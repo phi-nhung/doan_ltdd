@@ -70,7 +70,7 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - assets/doan1.db
+    - assets/doan2.db
     - assets/fonts/
     - assets/images/
     - assets/cafe_sua.jpg
