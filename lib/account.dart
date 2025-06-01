@@ -22,7 +22,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final nhanVien = widget.nhanVien;
     _nameController = TextEditingController(text: nhanVien.hoTen);
     _phoneController = TextEditingController(text: nhanVien.sdt);
-    _positionController = TextEditingController(text: nhanVien.chucVu);
+    _positionController = TextEditingController(text: nhanVien.maCV.toString());
   }
 
   @override
@@ -39,7 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
 
         _positionController = TextEditingController(
-          text: accountProvider.nhanVien?.chucVu ?? '',
+          text: accountProvider.nhanVien?.maCV.toString() ?? '',
         );
 
         return Scaffold(

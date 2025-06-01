@@ -36,7 +36,7 @@ class LoginProvider with ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('manv', nhanVien.maNhanVien);
       await prefs.setString('hoten', nhanVien.hoTen);
-      await prefs.setString('chucvu', nhanVien.chucVu);
+      await prefs.setString('chucvu', nhanVien.maCV.toString());
       await prefs.setString('sdt', nhanVien.sdt);
 
       return nhanVien;

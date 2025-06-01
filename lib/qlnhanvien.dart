@@ -14,39 +14,49 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
   TextEditingController searchController = TextEditingController();
   String selectedPosition = "Tất cả";
 
-
   @override
   void initState() {
     super.initState();
     _loadNhanVien();
+    _loadChucVu();
   }
 
-  Future<void> _loadNhanVien({String position = "Tất cả"}) async {
+  Future<void> _loadNhanVien({int? position}) async {
     String sql = '''
-      SELECT MANHANVIEN, HOTEN, CHUCVU, SDT
-      FROM NHANVIEN
+      SELECT NV.MANHANVIEN, NV.HOTEN, NV.MACV, NV.SDT, CV.TENCV
+      FROM NHANVIEN NV
+      LEFT JOIN CHUCVU CV ON NV.MACV = CV.MACV
     ''';
 
     List<Object?> args = [];
 
-    if (position != "Tất cả") {
-      sql += " WHERE CHUCVU = ?";
+    if (position != null && position != -1) {
+      sql += " WHERE NV.MACV = ?";
       args.add(position);
     }
 
     final data = await DatabaseHelper.rawQuery(sql, args);
     setState(() {
       nhanvien = data;
-      selectedPosition = position;
+      selectedPosition = position?.toString() ?? "Tất cả";
     });
   }
 
+  List<Map<String, dynamic>> chucvuList = [];
+
+  Future<void> _loadChucVu() async {
+    final data = await DatabaseHelper.rawQuery('SELECT MACV, TENCV FROM CHUCVU');
+    setState(() {
+      chucvuList = data;
+    });
+  }
 
   Future<void> _searchNhanVien(String keyword) async {
     final data = await DatabaseHelper.rawQuery('''
-      SELECT MANHANVIEN, HOTEN, CHUCVU, SDT
-      FROM NHANVIEN
-      WHERE HOTEN LIKE ?
+      SELECT NV.MANHANVIEN, NV.HOTEN, NV.MACV, NV.SDT, CV.TENCV
+      FROM NHANVIEN NV
+      LEFT JOIN CHUCVU CV ON NV.MACV = CV.MACV
+      WHERE NV.HOTEN LIKE ?
     ''', ['%$keyword%']);
 
     setState(() {
@@ -54,12 +64,23 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
     });
   }
 
+  Future<void> updateChucVu(int id, int newMaCV) async {
+    final db = await DatabaseHelper.database;
+    await db.update(
+      'NHANVIEN',
+      {'MACV': newMaCV},
+      where: 'MANHANVIEN = ?',
+      whereArgs: [id],
+    );
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Cập nhật chức vụ thành công')),
+    );
+  }
 
   void _showAddDialog() {
     TextEditingController nameController = TextEditingController();
     TextEditingController phoneController = TextEditingController();
-    TextEditingController positionController = TextEditingController();
-
+    int? selectedMaCV;
 
     showDialog(
       context: context,
@@ -70,7 +91,17 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
           children: [
             TextField(controller: nameController, decoration: InputDecoration(labelText: "Họ tên")),
             TextField(controller: phoneController, decoration: InputDecoration(labelText: "SĐT")),
-            TextField(controller: positionController, decoration: InputDecoration(labelText: "Chức vụ")),
+            DropdownButtonFormField<int>(
+              value: selectedMaCV,
+              items: chucvuList.map((cv) => DropdownMenuItem<int>(
+                value: cv['MACV'],
+                child: Text(cv['TENCV']),
+              )).toList(),
+              onChanged: (value) {
+                selectedMaCV = value;
+              },
+              decoration: InputDecoration(labelText: "Chức vụ"),
+            ),
           ],
         ),
         actions: [
@@ -81,7 +112,7 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
                 await DatabaseHelper.insert('NHANVIEN', {
                   'HOTEN': nameController.text,
                   'SDT': phoneController.text,
-                  'CHUCVU': positionController.text,
+                  'MACV': selectedMaCV,
                 });
                 Navigator.pop(context);
                 _loadNhanVien();
@@ -97,18 +128,16 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
   void _showEditDialog(Map<String, dynamic> employee) {
     TextEditingController nameController = TextEditingController(text: employee['HOTEN']);
     TextEditingController phoneController = TextEditingController(text: employee['SDT']);
-    TextEditingController positionController = TextEditingController(text: employee['CHUCVU']);
 
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text("Sửa nhân viên"),
+        title: Text("Sửa thông tin nhân viên"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(controller: nameController, decoration: InputDecoration(labelText: "Họ tên")),
             TextField(controller: phoneController, decoration: InputDecoration(labelText: "SĐT")),
-            TextField(controller: positionController, decoration: InputDecoration(labelText: "Chức vụ")),
           ],
         ),
         actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text("Huỷ")),
@@ -120,7 +149,6 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
                 {
                   'HOTEN': nameController.text,
                   'SDT': phoneController.text,
-                  'CHUCVU': positionController.text,
                 },
                 idColumn: 'MANHANVIEN',
               );
@@ -190,6 +218,80 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
     );
   }
 
+   void _showAddCategoryDialog() {
+    TextEditingController tenchucvuController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text("Thêm chức vụ"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: tenchucvuController,
+              decoration: InputDecoration(labelText: "Tên chức vụ"),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Huỷ"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (tenchucvuController.text.isNotEmpty) {
+                await DatabaseHelper.insert('CHUCVU', {
+                  'TENCV': tenchucvuController.text,
+                });
+                Navigator.pop(context);
+                _loadNhanVien(); // Tải lại danh sách nhân viên
+              }
+            },
+            child: Text("Thêm"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditChucVuDialog(Map<String, dynamic> chucvu) {
+    TextEditingController tenCVController = TextEditingController(text: chucvu['TENCV']);
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text("Sửa tên chức vụ"),
+        content: TextField(
+          controller: tenCVController,
+          decoration: InputDecoration(labelText: "Tên chức vụ"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Huỷ"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (tenCVController.text.isNotEmpty) {
+                await DatabaseHelper.update(
+                  'CHUCVU',
+                  chucvu['MACV'],
+                  {'TENCV': tenCVController.text},
+                  idColumn: 'MACV',
+                );
+                Navigator.pop(context);
+                _loadChucVu();
+                _loadNhanVien();
+              }
+            },
+            child: Text("Lưu"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -206,20 +308,58 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
               children: [
                 Row(
                   children: [
-                    DropdownButton<String>(
-                      value: selectedPosition,
-                      underline: SizedBox(),
-                      icon: Icon(Icons.arrow_drop_down, color: Color.fromARGB(255, 18, 18, 18)),
-                      style: TextStyle(color: Color.fromARGB(255, 18, 18, 18), fontSize: 16),
-                      items: ["Tất cả", "Quản lý", "Nhân viên"].map((String value) => DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      )).toList(),
-                      onChanged: (newValue) {
-                        if (newValue != null) {
-                          _loadNhanVien(position: newValue);
-                        }
+                    PopupMenuButton<int>(
+                      child: Row(
+                        children: [
+                          Text(
+                            selectedPosition == "Tất cả"
+                                ? "Tất cả"
+                                : (chucvuList.firstWhere(
+                                        (cv) => cv['MACV'].toString() == selectedPosition,
+                                        orElse: () => {'TENCV': 'Không rõ'})['TENCV']),
+                            style: TextStyle(
+                                color: Color.fromARGB(255, 18, 18, 18), fontSize: 16),
+                          ),
+                          Icon(Icons.arrow_drop_down, color: Color.fromARGB(255, 18, 18, 18)),
+                        ],
+                      ),
+                      itemBuilder: (context) => [
+                        PopupMenuItem<int>(
+                          value: -1,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Tất cả"),
+                            ],
+                          ),
+                        ),
+                        ...chucvuList.map((cv) => PopupMenuItem<int>(
+                              value: cv['MACV'],
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(cv['TENCV']),
+                                  IconButton(
+                                    icon: Icon(Icons.edit, size: 18),
+                                    onPressed: () {
+                                      Navigator.pop(context); // Đóng menu trước
+                                      _showEditChucVuDialog(cv);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            )),
+                      ],
+                      onSelected: (newValue) {
+                        _loadNhanVien(position: newValue == -1 ? null : newValue);
                       },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.add_circle_outline,
+                          color: Color.fromARGB(255, 18, 18, 18)),
+                      onPressed: () => _showAddCategoryDialog(),
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(),
                     ),
                   ],
                 ),
@@ -280,13 +420,26 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                 ),
                                 SizedBox(height: 4),
-                                Text("Chức vụ: ${emp['CHUCVU'] ?? ''}"),
+                                Text("SĐT: ${emp['SDT'] ?? ''}"),
                               ],
                             ),
                           ),
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
+                              DropdownButton<int>(
+                                value: emp['MACV'],
+                                items: chucvuList.map((cv) => DropdownMenuItem<int>(
+                                  value: cv['MACV'],
+                                  child: Text(cv['TENCV']),
+                                )).toList(),
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    emp['MACV'] = newValue!;
+                                    updateChucVu(emp['MANHANVIEN'], newValue);
+                                  });
+                                },
+                              ),
                               IconButton(
                                 icon: Icon(Icons.edit, color: const Color.fromARGB(255, 81, 81, 81)),
                                 onPressed: () => _showEditDialog(emp),
