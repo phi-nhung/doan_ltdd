@@ -105,7 +105,7 @@ class CartProvider with ChangeNotifier {
     return (totalAmount / 10000).floor().toDouble();
   }
 
-  Future<void> saveOrder({
+  Future<int?> saveOrder({
     required List<CartItem> items,
     required double totalAmount,
     required String paymentMethod,
@@ -193,6 +193,7 @@ class CartProvider with ChangeNotifier {
       }
 
       notifyListeners();
+      return newMaHD;
     } catch (e) {
       print('Lỗi chi tiết: $e');
       throw Exception('Lỗi khi lưu hóa đơn: $e'); 

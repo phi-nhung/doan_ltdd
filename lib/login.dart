@@ -88,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Sai email hoặc mật khẩu')),
+                      SnackBar(content: Text('Sai tên đăng nhập hoặc mật khẩu')),
                     );
                   }
                 },

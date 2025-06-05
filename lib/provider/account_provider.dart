@@ -112,7 +112,7 @@ class AccountProvider extends ChangeNotifier {
     final updatedNhanVien = NhanVien(
       maNhanVien: _nhanVien!.maNhanVien,
       hoTen: name.trim(),
-      chucVu: _nhanVien!.chucVu,
+      maCV: _nhanVien!.maCV,
       sdt: phone.trim(),
     );
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
 import 'package:doan/screens/order_screen.dart';
+import 'package:doan/screens/checkout_screen.dart';
 import 'package:provider/provider.dart';
 import 'provider/cart_provider.dart';
 
@@ -248,28 +249,53 @@ class _QL_BanState extends State<QL_Ban> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               IconButton(
-                                icon: Icon(Icons.edit, size: 20),
+                                icon: Icon(Icons.edit, size: 18), // Giảm size
+                                padding: EdgeInsets.zero, // Loại bỏ padding mặc định
+                                constraints: BoxConstraints(), // Loại bỏ constraints mặc định
                                 onPressed: () => _showEditDialog(ban),
                               ),
                               IconButton(
-                                icon: Icon(Icons.delete, size: 20),
+                                icon: Icon(Icons.delete, size: 18), // Giảm size
+                                padding: EdgeInsets.zero,
+                                constraints: BoxConstraints(),
                                 onPressed: () => _confirmDelete(ban['MABAN']),
                               ),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  textStyle: TextStyle(fontSize: 16),
-                                  backgroundColor: const Color.fromARGB(255, 237, 235, 235),
+                              Flexible(
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2), // Thu nhỏ padding
+                                    textStyle: TextStyle(fontSize: 13), // Giảm font
+                                    backgroundColor: const Color.fromARGB(255, 237, 235, 235),
+                                    minimumSize: Size(0, 32), // Giảm chiều cao tối thiểu
+                                  ),
+                                  onPressed: () {
+                                    if (trangThaiBan == 'Có khách' || trangThaiBan == 'Đang phục vụ') {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => CheckoutScreen(
+                                            tableNumber: ban['SOBAN'],
+                                            onCheckout: () => _loadBan(),
+                                          ),
+                                        ),
+                                      ).then((_) => _loadBan());
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => OrderScreen(datban: ban['SOBAN']),
+                                        ),
+                                      ).then((_) => _loadBan());
+                                    }
+                                  },
+                                  child: Text(
+                                    (trangThaiBan == 'Có khách' || trangThaiBan == 'Đang phục vụ')
+                                        ? "Thanh toán"
+                                        : "Đặt bàn",
+                                    style: TextStyle(color: Color.fromARGB(255, 18, 18, 18)),
+                                    overflow: TextOverflow.ellipsis, // Nếu text dài sẽ có dấu ...
+                                  ),
                                 ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => OrderScreen(datban: ban['SOBAN']),
-                                    ),
-                                  ).then((_) => _loadBan());
-                                },
-                                child: Text("Đặt bàn", style: TextStyle(color: Color.fromARGB(255, 18, 18, 18))),
                               ),
                             ],
                           ),

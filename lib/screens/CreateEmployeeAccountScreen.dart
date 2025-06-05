@@ -141,19 +141,17 @@ class _CreateEmployeeAccountScreenState extends State<CreateEmployeeAccountScree
                     }
 
                     try {
-                      // Bước 1: Chèn dữ liệu vào bảng NHANVIEN trước
-                      // Để lấy được MANHANVIEN (ID tự động tăng)
+                      int chucVuValue = (_selectedChucVu == "Quản lý") ? 1 : 2;
                       int manhanvienId = await DatabaseHelper.insert(
                         'NHANVIEN',
                         {
                           'HOTEN': hoten,
-                          'CHUCVU': _selectedChucVu,
+                          'MACV': chucVuValue, // 1 cho Quản lý, 2 cho Nhân viên
                           'SDT': sdt,
                         },
                       );
 
                       if (manhanvienId > 0) {
-                        // Bước 2: Chèn dữ liệu vào bảng USER, sử dụng MANHANVIEN vừa nhận được
                         int userId = await DatabaseHelper.insert(
                           'USER',
                           {
@@ -173,10 +171,9 @@ class _CreateEmployeeAccountScreenState extends State<CreateEmployeeAccountScree
                           _hotenController.clear();
                           _sdtController.clear();
                           setState(() {
-                            _selectedChucVu = 'Nhân viên'; // Reset chức vụ về mặc định
+                            _selectedChucVu = 'Nhân viên'; 
                           });
                         } else {
-                          // Nếu tạo USER thất bại, cân nhắc xóa NHANVIEN vừa tạo để tránh dữ liệu rác
                           await DatabaseHelper.delete('NHANVIEN', manhanvienId, idColumn: 'MANHANVIEN');
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Tạo tài khoản USER thất bại. Tên đăng nhập có thể đã tồn tại.')),

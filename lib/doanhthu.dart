@@ -71,56 +71,73 @@ class _DoanhThuState extends State<DoanhThu> {
       
       _customerList = customerMap.values.toList();
       _totalCustomers = _customerList.length;
-    } else if (_selectedFilter == 'Tháng') {
+   } else if (_selectedFilter == 'Tháng') {
       final currentYear = now.year;
-      final customerMap = <String, Map<String, dynamic>>{};
+      _totalRevenue = 0;
+      _customerList = [];
+      _barGroups.clear();
+
+      final customerMap = <String, Map<String, dynamic>>{}; 
 
       for (int month = 1; month <= 12; month++) {
         final firstDay = DateTime(currentYear, month, 1);
-        final lastDay = month < 12 
-            ? DateTime(currentYear, month + 1, 0) 
+        final lastDay = month < 12
+            ? DateTime(currentYear, month + 1, 0)
             : DateTime(currentYear + 1, 1, 0);
-        
-        // Format ngày theo chuẩn yyyy-MM-dd
+
         final startDate = DateFormat('yyyy-MM-dd').format(firstDay);
         final endDate = DateFormat('yyyy-MM-dd').format(lastDay);
 
+        // Lấy tổng doanh thu từng tháng
         final monthData = await DatabaseHelper.rawQuery(
-          "SELECT hd.TONGTIEN, hd.MAKH, kh.HOTEN FROM HOADON hd "
+          "SELECT SUM(TONGTIEN) AS TONGTIEN_THANG FROM HOADON "
+          "WHERE date(NGAYTAO) BETWEEN date('$startDate') AND date('$endDate')"
+        );
+
+        double monthTotal = (monthData.isNotEmpty && monthData.first['TONGTIEN_THANG'] != null)
+            ? (monthData.first['TONGTIEN_THANG'] as num).toDouble()
+            : 0.0;
+        _totalRevenue += monthTotal;
+
+        // Lấy danh sách khách hàng trong tháng đó
+        final customerData = await DatabaseHelper.rawQuery(
+          "SELECT kh.HOTEN, hd.TONGTIEN, kh.MAKH "
+          "FROM HOADON hd "
           "LEFT JOIN KHACHHANG kh ON hd.MAKH = kh.MAKH "
           "WHERE date(hd.NGAYTAO) BETWEEN date('$startDate') AND date('$endDate')"
         );
 
-        double monthTotal = monthData.fold(
-            0.0, (sum, item) => sum + (item['TONGTIEN'] ?? 0).toDouble());
-        _totalRevenue += monthTotal;
+        for (var item in customerData) {
+          final maKH = item['MAKH']?.toString() ?? 'NULL';
+          final tenKH = item['HOTEN'] ?? 'Khách vãng lai';
+          final tongTien = (item['TONGTIEN'] ?? 0).toDouble();
 
-        // Tổng hợp thông tin khách hàng (giữ nguyên phần này)
-        for (var item in monthData) {
-          final maKH = item['MAKH'].toString();
           if (customerMap.containsKey(maKH)) {
-            customerMap[maKH]!['TONGTIEN'] += (item['TONGTIEN'] ?? 0).toDouble();
+            customerMap[maKH]!['TONGTIEN'] += tongTien;
           } else {
             customerMap[maKH] = {
-              'HOTEN': item['HOTEN'] ?? 'Khách vãng lai',
-              'TONGTIEN': (item['TONGTIEN'] ?? 0).toDouble(),
+              'HOTEN': tenKH,
+              'TONGTIEN': tongTien,
             };
           }
         }
 
+        // Tạo biểu đồ cột theo tháng
         _barGroups.add(
           BarChartGroupData(
-            x: month - 1, 
+            x: month - 1,
             barRods: [
               BarChartRodData(toY: monthTotal, color: Colors.brown),
             ],
           ),
         );
       }
-      
+
       _customerList = customerMap.values.toList();
       _totalCustomers = _customerList.length;
     }
+
+
     setState(() {});
   }
 

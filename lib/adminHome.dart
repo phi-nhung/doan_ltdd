@@ -32,7 +32,7 @@ class AdminHome extends StatelessWidget {
       );
     }
 
-    final String chucVu = nhanVien.chucVu.toLowerCase();
+    final String chucVu = nhanVien.maCV.toString().toLowerCase();
 
     final List<_DashboardItem> allItems = [
       _DashboardItem(const OrderScreen(), Icons.sell_outlined, 
@@ -49,8 +49,8 @@ class AdminHome extends StatelessWidget {
         AppLocalizations.get(context, 'employees')),
       _DashboardItem(DoanhThu(), Icons.bar_chart_outlined, 
         AppLocalizations.get(context, 'revenue')),
-      _DashboardItem(const SettingsScreen(), Icons.settings, 
-        AppLocalizations.get(context, 'settings')),
+      // _DashboardItem(const SettingsScreen(), Icons.settings, 
+      //   AppLocalizations.get(context, 'settings')),
       _DashboardItem(const CreateEmployeeAccountScreen(), Icons.person_add_alt_1_rounded, 
         AppLocalizations.get(context, 'create_account')),
     ];

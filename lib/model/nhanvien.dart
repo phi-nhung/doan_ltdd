@@ -1,13 +1,13 @@
 class NhanVien {
   final int maNhanVien;
   final String hoTen;
-  final String chucVu;
+  final int maCV; // Đổi từ String chucVu sang int maCV
   final String sdt;
 
   NhanVien({
     required this.maNhanVien,
     required this.hoTen,
-    required this.chucVu,
+    required this.maCV,
     required this.sdt,
   });
 
@@ -15,7 +15,7 @@ class NhanVien {
     return NhanVien(
       maNhanVien: map['MANHANVIEN'],
       hoTen: map['HOTEN'],
-      chucVu: map['CHUCVU'],
+      maCV: map['MACV'], // Đổi từ CHUCVU sang MACV
       sdt: map['SDT'],
     );
   }
@@ -24,7 +24,7 @@ class NhanVien {
     return {
       'MANHANVIEN': maNhanVien,
       'HOTEN': hoTen,
-      'CHUCVU': chucVu,
+      'MACV': maCV, // Đổi từ CHUCVU sang MACV
       'SDT': sdt,
     };
   }

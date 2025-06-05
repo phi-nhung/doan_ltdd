@@ -5,6 +5,7 @@ import '../provider/cart_provider.dart';
 import '../provider/account_provider.dart';
 import '../model/cart_item.dart';
 import 'package:intl/intl.dart';
+import '../invoice_exporter.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final int? tableNumber;
@@ -27,6 +28,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Map<String, dynamic>? _customer;  // Add this line to track selected customer
   bool _applyDiscount = false;
   int _pointsToDeduct = 0;
+  Map<String, dynamic>? _tempCustomer;  // Biến tạm để lưu khách hàng mới
 
   // Add this method to show customer search dialog
   Future<void> _showCustomerSearchDialog() async {
@@ -68,9 +70,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   FROM KHACHHANG kh
                   LEFT JOIN LOAIKHACHHANG lkh ON 
                     CASE 
-                      WHEN kh.DIEMTL >= 1000 THEN lkh.MALOAIKH = 3
-                      WHEN kh.DIEMTL >= 500 THEN lkh.MALOAIKH = 2
-                      ELSE lkh.MALOAIKH = 1
+                      WHEN kh.DIEMTL >= 100 THEN lkh.MALOAIKH = 1
+                      WHEN kh.DIEMTL >= 50 THEN lkh.MALOAIKH = 2
+                      ELSE lkh.MALOAIKH = 3
                     END
                   WHERE kh.SDT = ?
                   ''',
@@ -81,6 +83,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   // Tự động áp dụng chiết khấu từ loại khách hàng
                   setState(() {
                     _customer = results.first;
+                    _tempCustomer = null; // Clear temp customer khi tìm thấy khách hàng có sẵn
                     // Không tự động set _discount, chỉ lưu chiết khấu vào _customer
                   });
                   Navigator.pop(ctx);
@@ -172,28 +175,30 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   return;
                 }
 
-                // Thêm khách hàng mới
-                final id = await DatabaseHelper.rawInsert(
-                  '''INSERT INTO KHACHHANG (HOTEN, SDT, DIACHI, EMAIL, DIEMTL)
-                     VALUES (?, ?, ?, ?, 0)''',
-                  [name, phone, addressController.text, emailController.text]
-                );
-
-                final newCustomer = {
-                  'MAKH': id,
+                // Thay vì lưu ngay vào database, lưu vào biến tạm
+                final newTempCustomer = {
+                  'MAKH': null, // Chưa có ID vì chưa lưu vào DB
                   'HOTEN': name,
                   'SDT': phone,
                   'DIACHI': addressController.text,
                   'EMAIL': emailController.text,
                   'DIEMTL': 0,
+                  'TENLOAIKH': 'Thường', // Khách hàng mới là loại thường
+                  'CHIETKHAU': 0, // Khách hàng mới không có chiết khấu
+                  'isTemp': true, // Đánh dấu là khách hàng tạm
                 };
 
-                setState(() => _customer = newCustomer);
-                setState(() => _discount = 0);
+                setState(() {
+                  _tempCustomer = newTempCustomer;
+                  _customer = newTempCustomer; // Hiển thị thông tin khách hàng tạm
+                  _discount = 0; // Reset discount cho khách hàng mới
+                  _applyDiscount = false;
+                });
+                
                 Navigator.pop(ctx);
                 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Đã thêm khách hàng mới')),
+                  SnackBar(content: Text('Đã thêm khách hàng tạm thời. Sẽ được lưu khi thanh toán.')),
                 );
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -220,38 +225,98 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ? cartProvider.tableItems[widget.tableNumber] ?? []
               : items;
 
-          await cartProvider.saveOrder(
+          // Nếu có khách hàng tạm, lưu vào database trước
+          Map<String, dynamic>? finalCustomer = _customer;
+          if (_tempCustomer != null && _tempCustomer!['isTemp'] == true) {
+            try {
+              final id = await DatabaseHelper.rawInsert(
+                '''INSERT INTO KHACHHANG (HOTEN, SDT, DIACHI, EMAIL, DIEMTL)
+                   VALUES (?, ?, ?, ?, 0)''',
+                [
+                  _tempCustomer!['HOTEN'],
+                  _tempCustomer!['SDT'],
+                  _tempCustomer!['DIACHI'] ?? '',
+                  _tempCustomer!['EMAIL'] ?? ''
+                ]
+              );
+
+              // Cập nhật thông tin khách hàng với ID thật
+              finalCustomer = Map<String, dynamic>.from(_tempCustomer!);
+              finalCustomer!['MAKH'] = id;
+              finalCustomer!.remove('isTemp');
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Đã lưu thông tin khách hàng mới vào hệ thống')),
+              );
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Lỗi khi lưu khách hàng: $e')),
+              );
+              return;
+            }
+          }
+
+          // Lưu hóa đơn
+          final orderId = await cartProvider.saveOrder(
             items: orderItems,
             totalAmount: totalAmount,
             paymentMethod: _selectedPaymentMethod,
             tableNumber: widget.tableNumber,
             manv: nhanVien.maNhanVien,
             tennv: nhanVien.hoTen,
-            customer: _customer,
+            customer: finalCustomer,
             discount: _applyDiscount ? _discount : 0,
             additionalFee: _additionalFee,
           );
-          
+
+          if (orderId == null) {
+            throw Exception('Không thể lưu đơn hàng');
+          }
+
           // Clear the appropriate cart
           if (widget.tableNumber != null) {
             cartProvider.clearTableCart(widget.tableNumber!);
           } else {
             cartProvider.clearCart();
           }
-          
+
+          // Hỏi in hóa đơn
+          final printResult = await showDialog<bool>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: Text('In hóa đơn?'),
+              content: Text('Bạn có muốn in hóa đơn không?'),
+              actions: [
+                TextButton(
+                  child: Text('Không'),
+                  onPressed: () => Navigator.pop(ctx, false),
+                ),
+                ElevatedButton(
+                  child: Text('Có'),
+                  onPressed: () => Navigator.pop(ctx, true),
+                ),
+              ],
+            ),
+          );
+
+          if (printResult == true) {
+            try {
+              final exporter = InvoiceExporter();
+              await exporter.exportInvoiceToPdf(context, orderId);
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Lỗi khi in hóa đơn: ${e.toString()}')),
+              );
+            }
+          }
+
+          // Hiển thị thông báo thành công và quay lại trang bán hàng
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Thanh toán thành công')),
           );
-          
           widget.onCheckout();
-          showAboutDialog(context: context, 
-            applicationName: 'Thanh toán thành công',
-            applicationVersion: '1.0.0',
-            children: [
-              Text('Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!'),
-            ],
-          );
           Navigator.pop(context, true);
+
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Lỗi: ${e.toString()}')),
@@ -298,7 +363,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ),
                         IconButton(
                           icon: Icon(Icons.clear),
-                          onPressed: () => setState(() => _customer = null),
+                          onPressed: () => setState(() {
+                            _customer = null;
+                            _tempCustomer = null;
+                          }),
                         ),
                       ],
                     ),
@@ -307,6 +375,32 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             // Hiển thị thông tin khách hàng nếu có
             if (_customer != null) ...[
               Divider(),
+              // Hiển thị badge nếu là khách hàng tạm
+              if (_customer!['isTemp'] == true)
+                Container(
+                  margin: EdgeInsets.only(bottom: 8),
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.orange.shade300),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.info_outline, size: 16, color: Colors.orange.shade700),
+                      SizedBox(width: 4),
+                      Text(
+                        'Khách hàng mới (chưa lưu)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.orange.shade700,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 8),
                 child: Column(

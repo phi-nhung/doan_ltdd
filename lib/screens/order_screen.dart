@@ -12,6 +12,7 @@
   import 'cart_screen.dart';
   import 'checkout_screen.dart';
   import 'package:intl/intl.dart';
+  import '../invoice_exporter.dart';
 
   class OrderScreen extends StatefulWidget {
     final int? datban;
@@ -226,22 +227,23 @@
           backgroundColor: Color.fromARGB(255, 224, 224, 224),
           centerTitle: true,
           actions: [
-            badges.Badge(
-              badgeContent: Text(
-                cart.items.length.toString(),
-                style: TextStyle(color: Colors.black, fontSize: 12),
+            if (_orderType == 'Mang đi')
+              badges.Badge(
+                badgeContent: Text(
+                  cart.items.length.toString(),
+                  style: TextStyle(color: Colors.black, fontSize: 12),
+                ),
+                position: badges.BadgePosition.topEnd(top: 0, end: 3),
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CartScreen()),
+                    );
+                  },
+                  icon: Icon(Icons.shopping_cart, color: Colors.black),
+                ),
               ),
-              position: badges.BadgePosition.topEnd(top: 0, end: 3),
-              child: IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => CartScreen()),
-                  );
-                },
-                icon: Icon(Icons.shopping_cart, color: Colors.black),
-              ),
-            ),
           ],
         ),
         body:
