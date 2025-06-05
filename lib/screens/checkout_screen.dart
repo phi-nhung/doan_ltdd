@@ -153,10 +153,41 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             onPressed: () async {
               final phone = phoneController.text.trim();
               final name = nameController.text.trim();
-              
-              if (phone.isEmpty || name.isEmpty) {
+              final email = emailController.text.trim();
+              final address = addressController.text.trim();
+
+              // Regex kiểm tra
+              final phoneReg = RegExp(r'^\d{10}$');
+              final nameReg = RegExp(r'^[a-zA-ZÀ-ỹ\s]+$');
+              final emailReg = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+
+              if (name.isEmpty || phone.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Vui lòng nhập họ tên và số điện thoại')),
+                );
+                return;
+              }
+              if (!phoneReg.hasMatch(phone)) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Số điện thoại phải là 10 chữ số')),
+                );
+                return;
+              }
+              if (!nameReg.hasMatch(name)) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Tên chỉ được chứa chữ cái và khoảng trắng')),
+                );
+                return;
+              }
+              if (email.isNotEmpty && !emailReg.hasMatch(email)) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Email không hợp lệ')),
+                );
+                return;
+              }
+              if (address.length > 80) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Địa chỉ không được quá 80 ký tự')),
                 );
                 return;
               }

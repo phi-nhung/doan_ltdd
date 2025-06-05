@@ -2,7 +2,6 @@ import 'package:doan/login_provider.dart';
 import 'package:doan/provider/account_provider.dart';
 import 'package:doan/provider/cart_provider.dart';
 import 'package:doan/provider/locale_provider.dart';
-import 'package:doan/provider/theme_provider.dart';
 import 'package:doan/provider/font_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +17,6 @@ void main() {
         ChangeNotifierProvider(create: (_) => AccountProvider()),
         ChangeNotifierProvider(create: (context) => CartProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => FontProvider()),
       ],
       child: const MyApp(),
@@ -31,13 +29,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer3<ThemeProvider, LocaleProvider, FontProvider>(
-      builder: (context, themeProvider, localeProvider, fontProvider, child) {
-        final baseTheme = themeProvider.isDarkMode ? ThemeData.dark() : ThemeData.light();
+    return Consumer2<LocaleProvider, FontProvider>(
+      builder: (context, localeProvider, fontProvider, child) {
+        final baseTheme = ThemeData.light();
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           home: LoginScreen(),
-
           theme: baseTheme.copyWith(
             textTheme: GoogleFonts.robotoTextTheme(baseTheme.textTheme),
           ),
