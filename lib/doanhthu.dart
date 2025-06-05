@@ -9,11 +9,11 @@ class DoanhThu extends StatefulWidget {
 }
 
 class _DoanhThuState extends State<DoanhThu> {
-  String _selectedFilter = 'Hôm nay';
+  String _selectedFilter = 'Tuần';
   List<BarChartGroupData> _barGroups = [];
   double _totalRevenue = 0;
   int _totalCustomers = 0;
-  List<Map<String, dynamic>> _customerList = []; // Danh sách khách hàng
+  List<Map<String, dynamic>> _customerList = [  ]; // Danh sách khách hàng
 
   @override
   void initState() {
@@ -29,43 +29,7 @@ class _DoanhThuState extends State<DoanhThu> {
     _totalCustomers = 0;
     _customerList = []; // Reset danh sách khách hàng
 
-    if (_selectedFilter == 'Hôm nay') {
-      final todayStr = DateFormat('yyyy-MM-dd').format(now);
-      rawData = await DatabaseHelper.rawQuery(
-        "SELECT hd.TONGTIEN, hd.MAKH, kh.HOTEN FROM HOADON hd "
-        "LEFT JOIN KHACHHANG kh ON hd.MAKH = kh.MAKH "
-        "WHERE hd.NGAYTAO LIKE '$todayStr%'"
-      );
-
-      _totalRevenue = rawData.fold(
-          0.0, (sum, item) => sum + (item['TONGTIEN'] ?? 0).toDouble(),);
-
-      // Lấy danh sách khách hàng và tổng tiền
-      final customerMap = <String, Map<String, dynamic>>{};
-      for (var item in rawData) {
-        final maKH = item['MAKH'].toString();
-        if (customerMap.containsKey(maKH)) {
-          customerMap[maKH]!['TONGTIEN'] += (item['TONGTIEN'] ?? 0).toDouble();
-        } else {
-          customerMap[maKH] = {
-            'HOTEN': item['HOTEN'] ?? 'Khách vãng lai',
-            'TONGTIEN': (item['TONGTIEN'] ?? 0).toDouble(),
-          };
-        }
-      }
-      
-      _customerList = customerMap.values.toList();
-      _totalCustomers = _customerList.length;
-
-      _barGroups = [
-        BarChartGroupData(
-          x: 0,
-          barRods: [
-            BarChartRodData(toY: _totalRevenue, color: Colors.brown),
-          ],
-        ),
-      ];
-    } else if (_selectedFilter == 'Tuần') {
+    if (_selectedFilter == 'Tuần') {
       final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
       final customerMap = <String, Map<String, dynamic>>{};
 
@@ -112,21 +76,26 @@ class _DoanhThuState extends State<DoanhThu> {
       final customerMap = <String, Map<String, dynamic>>{};
 
       for (int month = 1; month <= 12; month++) {
-        final startDate = DateTime(currentYear, month, 1);
-        final endDate = DateTime(currentYear, month + 1, 0);
+        final firstDay = DateTime(currentYear, month, 1);
+        final lastDay = month < 12 
+            ? DateTime(currentYear, month + 1, 0) 
+            : DateTime(currentYear + 1, 1, 0);
         
+        // Format ngày theo chuẩn yyyy-MM-dd
+        final startDate = DateFormat('yyyy-MM-dd').format(firstDay);
+        final endDate = DateFormat('yyyy-MM-dd').format(lastDay);
+
         final monthData = await DatabaseHelper.rawQuery(
           "SELECT hd.TONGTIEN, hd.MAKH, kh.HOTEN FROM HOADON hd "
           "LEFT JOIN KHACHHANG kh ON hd.MAKH = kh.MAKH "
-          "WHERE hd.NGAYTAO >= '${DateFormat('yyyy-MM-dd').format(startDate)}' "
-          "AND hd.NGAYTAO <= '${DateFormat('yyyy-MM-dd').format(endDate)}'"
+          "WHERE date(hd.NGAYTAO) BETWEEN date('$startDate') AND date('$endDate')"
         );
 
         double monthTotal = monthData.fold(
-            0.0, (sum, item) => sum + (item['TONGTIEN'] ?? 0).toDouble(),);
+            0.0, (sum, item) => sum + (item['TONGTIEN'] ?? 0).toDouble());
         _totalRevenue += monthTotal;
 
-        // Tổng hợp thông tin khách hàng
+        // Tổng hợp thông tin khách hàng (giữ nguyên phần này)
         for (var item in monthData) {
           final maKH = item['MAKH'].toString();
           if (customerMap.containsKey(maKH)) {
@@ -141,7 +110,7 @@ class _DoanhThuState extends State<DoanhThu> {
 
         _barGroups.add(
           BarChartGroupData(
-            x: month - 1, // Bắt đầu từ 0 (Tháng 1)
+            x: month - 1, 
             barRods: [
               BarChartRodData(toY: monthTotal, color: Colors.brown),
             ],
@@ -152,7 +121,6 @@ class _DoanhThuState extends State<DoanhThu> {
       _customerList = customerMap.values.toList();
       _totalCustomers = _customerList.length;
     }
-
     setState(() {});
   }
 
@@ -161,10 +129,6 @@ class _DoanhThuState extends State<DoanhThu> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Doanh thu'),
-        actions: [
-          IconButton(icon: Icon(Icons.notifications), onPressed: () {}),
-          IconButton(icon: Icon(Icons.help_outline), onPressed: () {}),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -173,7 +137,7 @@ class _DoanhThuState extends State<DoanhThu> {
           children: [
             DropdownButton<String>(
               value: _selectedFilter,
-              items: ['Hôm nay', 'Tuần', 'Tháng']
+              items: ['Tuần', 'Tháng']
                   .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                   .toList(),
               onChanged: (value) {
@@ -213,7 +177,7 @@ class _DoanhThuState extends State<DoanhThu> {
                                   final dayOfWeek = DateFormat('E').format(day);
                                   return Text(dayOfWeek);
                                 } else if (_selectedFilter == 'Tháng') {
-                                  return Text('T${value.toInt() + 1}'); // Hiển thị Tháng 1, Tháng 2,...
+                                  return Text('T${value.toInt() + 1}'); 
                                 }
                                 return Text('');
                               },

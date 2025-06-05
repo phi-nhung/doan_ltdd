@@ -9,12 +9,30 @@ class QL_KhachHang extends StatefulWidget {
 
 class _QL_KhachHangState extends State<QL_KhachHang> {
   List<Map<String, dynamic>> _customers = [];
+  List<Map<String, dynamic>> _filteredCustomers = [];
   String _selectedFilter = 'Tất cả';
+  String _selectedCategory = 'Tất cả';
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _loadCustomers();
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    setState(() {
+      _searchQuery = _searchController.text;
+      _applyFilters();
+    });
   }
 
   Future<void> _loadCustomers() async {
@@ -25,33 +43,59 @@ class _QL_KhachHangState extends State<QL_KhachHang> {
       GROUP BY KH.MAKH
     ''');
 
-
-    final now = DateTime.now();
-    final todayStr = DateFormat('yyyy-MM-dd').format(now);
-    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-
-    List<Map<String, dynamic>> filtered;
-
-    switch (_selectedFilter) {
-      case 'Hôm nay':
-        filtered = data.where((item) => item['NGAYTAO'] == todayStr).toList();
-        break;
-      case 'Tuần này':
-        filtered = data.where((item) {
-          final date = DateTime.tryParse(item['NGAYTAO'] ?? '');
-          return date != null && !date.isBefore(startOfWeek);
-        }).toList();
-        break;
-      default:
-        filtered = data;
-    }
-
     setState(() {
-      _customers = filtered;
+      _customers = data;
+      _applyFilters();
     });
   }
 
-  void _showAddDialog() {
+void _applyFilters() {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+  final startOfWeekDate = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
+
+  List<Map<String, dynamic>> filtered = List.from(_customers);
+
+  // Áp dụng bộ lọc thời gian
+  switch (_selectedFilter) {
+    case 'Hôm nay':
+      filtered = filtered.where((item) {
+        if (item['NGAYTAO'] == null) return false;
+        final date = DateTime.tryParse(item['NGAYTAO'])?.toLocal();
+        if (date == null) return false;
+        final itemDate = DateTime(date.year, date.month, date.day);
+        return itemDate == today;
+      }).toList();
+      break;
+    case 'Tuần này':
+      filtered = filtered.where((item) {
+        if (item['NGAYTAO'] == null) return false;
+        final date = DateTime.tryParse(item['NGAYTAO'])?.toLocal();
+        if (date == null) return false;
+        final itemDate = DateTime(date.year, date.month, date.day);
+        return itemDate.isAfter(startOfWeekDate) || itemDate == startOfWeekDate;
+      }).toList();
+      break;
+    default:
+      // Không lọc
+      break;
+  }
+
+       
+    // Áp dụng tìm kiếm
+    if (_searchQuery.isNotEmpty) {
+      filtered = filtered.where((customer) {
+        final name = customer['HOTEN']?.toString().toLowerCase() ?? '';
+        return name.contains(_searchQuery.toLowerCase());
+      }).toList();
+    }
+
+    setState(() {
+      _filteredCustomers = filtered;
+    });
+  }
+    void _showAddDialog() {
     TextEditingController nameController = TextEditingController();
     TextEditingController phoneController = TextEditingController();
     TextEditingController addressController = TextEditingController();
@@ -161,6 +205,7 @@ class _QL_KhachHangState extends State<QL_KhachHang> {
       appBar: AppBar(
         title: Text("Danh sách khách hàng"),
         actions: [
+          // Nút lọc thời gian
           DropdownButton<String>(
             value: _selectedFilter,
             items: ['Tất cả', 'Hôm nay', 'Tuần này']
@@ -169,8 +214,8 @@ class _QL_KhachHangState extends State<QL_KhachHang> {
             onChanged: (value) {
               setState(() {
                 _selectedFilter = value!;
+                _applyFilters();
               });
-              _loadCustomers();
             },
             underline: SizedBox(),
             icon: Icon(Icons.filter_list, color: Colors.white),
@@ -178,63 +223,81 @@ class _QL_KhachHangState extends State<QL_KhachHang> {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: _customers.length,
-        itemBuilder: (context, index) {
-          final customer = _customers[index];
-          // Màu nền xen kẽ
-          final backgroundColor = index % 2 == 0 
-              ? Colors.brown[50] // Màu nâu nhạt cho hàng chẵn
-              : Colors.brown[100]; // Màu nâu sáng hơn cho hàng lẻ
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                labelText: 'Tìm kiếm khách hàng',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
           
-          return Card(
-            margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            elevation: 2,
-            color: backgroundColor,
-            child: InkWell(
-              onTap: () {
-                // Có thể thêm hành động khi nhấn vào khách hàng
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+          Expanded(
+            child: ListView.builder(
+              itemCount: _filteredCustomers.length,
+              itemBuilder: (context, index) {
+                final customer = _filteredCustomers[index];
+                // Màu nền xen kẽ
+                final backgroundColor = index % 2 == 0 
+                    ? Colors.brown[50] 
+                    : Colors.brown[100];
+                
+                return Card(
+                  margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  elevation: 2,
+                  color: backgroundColor,
+                  child: InkWell(
+                    onTap: () {
+                      // Có thể thêm hành động khi nhấn vào khách hàng
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Row(
                         children: [
-                          Text(
-                            customer['HOTEN'],
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  customer['HOTEN'],
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text("SĐT: ${customer['SDT'] ?? ''}"),
+                                Text("Điểm tích lũy: ${customer['DIEMTL'] ?? '0'}"),
+                              ],
                             ),
                           ),
-                          SizedBox(height: 4),
-                          Text("SĐT: ${customer['SDT'] ?? ''}"),
-                          Text("Điểm tích lũy: ${customer['DIEMTL'] ?? '0'}"),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.edit, color: Colors.brown[800]),
+                                onPressed: () => _showEditDialog(customer),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete, color: Colors.brown[800]),
+                                onPressed: () => _confirmDeleteCustomer(customer['MAKH']),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.edit, color: Colors.brown[800]),
-                          onPressed: () => _showEditDialog(customer),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.delete, color: Colors.brown[800]),
-                          onPressed: () => _confirmDeleteCustomer(customer['MAKH']),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddDialog,
