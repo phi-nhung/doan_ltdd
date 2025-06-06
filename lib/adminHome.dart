@@ -33,6 +33,7 @@ class AdminHome extends StatelessWidget {
     }
 
     final String chucVu = nhanVien.maCV.toString().toLowerCase();
+    print ('Chức vụ của nhân viên: $chucVu');
 
     final List<_DashboardItem> allItems = [
       _DashboardItem(const OrderScreen(), Icons.sell_outlined, 
@@ -100,6 +101,7 @@ class AdminHome extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
+            
             children: allItems
                 .map((item) => _buildDashboardItem(
                     context, item.widget, item.icon, item.title, chucVu))
@@ -122,8 +124,7 @@ class AdminHome extends StatelessWidget {
             AppLocalizations.get(context, 'revenue'),
             AppLocalizations.get(context, 'settings'),
           ];
-
-          if ((chucVu == 'nhân viên' || chucVu == 'nhan vien') && !allowedForNhanVien.contains(title)) {
+          if ((chucVu == '2' ) && !allowedForNhanVien.contains(title)) {
             showDialog(
               context: context,
               builder: (_) => AlertDialog(
