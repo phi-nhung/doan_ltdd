@@ -1,4 +1,4 @@
-  import 'dart:typed_data';
+import 'dart:typed_data';
   import 'package:doan/model/cart_item.dart';
   import 'package:flutter/material.dart';
   import 'package:provider/provider.dart';
@@ -174,6 +174,23 @@
                       ElevatedButton(
                         onPressed: () async {
                           try {
+                            if (_selectedTable != null) {
+                              // Khi thêm món đầu tiên cho bàn
+                              final today = DateTime.now().toIso8601String().substring(0, 10);
+                              final existingBill = await DatabaseHelper.rawQuery(
+                                "SELECT * FROM HOADON WHERE MABAN = ? AND NGAYTAO = ? AND TRANGTHAI = 'Chưa thanh toán'",
+                                [_selectedTable, today],
+                              );
+                              if (existingBill.isEmpty) {
+                                await DatabaseHelper.insert('HOADON', {
+                                  'MABAN': widget.datban,
+                                  'GIO': DateTime.now().toIso8601String().substring(11, 16),
+                                  'NGAYTAO': DateTime.now().toIso8601String().substring(0, 10),
+                                  'TRANGTHAI': 'Chưa thanh toán',
+                                  'TONGTIEN': 0,
+                                });
+                              }
+                            }
                             cart.addToCart(
                               item,
                               icePercentage,

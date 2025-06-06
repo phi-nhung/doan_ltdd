@@ -4,7 +4,7 @@
             "outputFile": "phinhung.come.doan.app-mergeDebugResources-41:/values-ar/values-ar.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Nguyen Phi Nhung\\.gradle\\caches\\8.10.2\\transforms\\67e431d42222568371fff0afd22bbdc6\\transformed\\appcompat-1.6.1\\res\\values-ar\\values-ar.xml",
+                    "source": "C:\\Users\\DELL\\.gradle\\caches\\8.10.2\\transforms\\67e431d42222568371fff0afd22bbdc6\\transformed\\appcompat-1.6.1\\res\\values-ar\\values-ar.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -21,24 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Nguyen Phi Nhung\\.gradle\\caches\\8.10.2\\transforms\\0098a6e93522fecc805d8900172003dc\\transformed\\preference-1.2.1\\res\\values-ar\\values-ar.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8",
-                        "startColumns": "4,4,4,4,4,4,4",
-                        "startOffsets": "105,172,265,351,484,653,735",
-                        "endColumns": "66,92,85,132,168,81,79",
-                        "endOffsets": "167,260,346,479,648,730,810"
-                    },
-                    "to": {
-                        "startLines": "36,37,38,39,42,43,44",
-                        "startColumns": "4,4,4,4,4,4,4",
-                        "startOffsets": "3471,3538,3631,3717,4033,4202,4284",
-                        "endColumns": "66,92,85,132,168,81,79",
-                        "endOffsets": "3533,3626,3712,3845,4197,4279,4359"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\Nguyen Phi Nhung\\.gradle\\caches\\8.10.2\\transforms\\8cf478dec41eed746328fa8046755ba2\\transformed\\core-1.13.1\\res\\values-ar\\values-ar.xml",
+                    "source": "C:\\Users\\DELL\\.gradle\\caches\\8.10.2\\transforms\\8cf478dec41eed746328fa8046755ba2\\transformed\\core-1.13.1\\res\\values-ar\\values-ar.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",
@@ -52,6 +35,23 @@
                         "startOffsets": "2759,2852,2954,3049,3152,3255,3357,3932",
                         "endColumns": "92,101,94,102,102,101,113,100",
                         "endOffsets": "2847,2949,3044,3147,3250,3352,3466,4028"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\DELL\\.gradle\\caches\\8.10.2\\transforms\\0098a6e93522fecc805d8900172003dc\\transformed\\preference-1.2.1\\res\\values-ar\\values-ar.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8",
+                        "startColumns": "4,4,4,4,4,4,4",
+                        "startOffsets": "105,172,265,351,484,653,735",
+                        "endColumns": "66,92,85,132,168,81,79",
+                        "endOffsets": "167,260,346,479,648,730,810"
+                    },
+                    "to": {
+                        "startLines": "36,37,38,39,42,43,44",
+                        "startColumns": "4,4,4,4,4,4,4",
+                        "startOffsets": "3471,3538,3631,3717,4033,4202,4284",
+                        "endColumns": "66,92,85,132,168,81,79",
+                        "endOffsets": "3533,3626,3712,3845,4197,4279,4359"
                     }
                 }
             ]

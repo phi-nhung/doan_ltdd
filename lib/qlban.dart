@@ -27,22 +27,22 @@ class _QL_BanState extends State<QL_Ban> {
       where = "WHERE BAN.TRANGTHAI = '$selectedTrangThai'";
     }
 
-    String today = DateTime.now().toIso8601String().substring(0, 10);
+    // Lấy ngày hôm nay theo định dạng yyyy-MM-dd
+    final today = DateTime.now().toIso8601String().substring(0, 10);
 
+    // Lấy tổng tiền từ hóa đơn, thời gian từ trường THOIGIAN của BAN
     final data = await DatabaseHelper.rawQuery("""
-      SELECT BAN.*, 
-            IFNULL(MAX(HOADON.GIO), '') AS GIO, 
+       SELECT BAN.*, 
             IFNULL(SUM(CASE WHEN HOADON.NGAYTAO = ? THEN HOADON.TONGTIEN ELSE 0 END), 0) AS TONGTIEN
       FROM BAN
-      LEFT JOIN HOADON ON BAN.MABAN = HOADON.MABAN
+      LEFT JOIN HOADON ON BAN.MABAN = HOADON.MABAN AND HOADON.NGAYTAO = ?
       $where
       GROUP BY BAN.MABAN
       ORDER BY BAN.SOBAN
-    """, [today]);
+    """, [today, today]);
 
     setState(() => dsBan = data);
   }
-
 
   void _showAddDialog() {
     TextEditingController soBanCtrl = TextEditingController();
@@ -77,6 +77,7 @@ class _QL_BanState extends State<QL_Ban> {
                 await DatabaseHelper.insert('BAN', {
                   'SOBAN': int.parse(soBanCtrl.text),
                   'TRANGTHAI': trangThai,
+                  'THOIGIAN': '', // Chưa có thời gian khi thêm mới
                 });
                 Navigator.pop(context);
                 _loadBan();
@@ -182,6 +183,55 @@ class _QL_BanState extends State<QL_Ban> {
     return '${amount.toString()} đ';
   }
 
+  // Định dạng thời gian dạng 1h30p, 30p, 2h... từ ISO string
+  String formatDurationFromIso(String? iso) {
+    if (iso == null || iso.isEmpty) return '';
+    try {
+      final start = DateTime.parse(iso);
+      final now = DateTime.now();
+      final diff = now.difference(start);
+      final hours = diff.inHours;
+      final minutes = diff.inMinutes % 60;
+      if (diff.inMinutes < 1) return '0p';
+      if (hours == 0) return '${minutes}p';
+      if (minutes == 0) return '${hours}h';
+      return '${hours}h${minutes}p';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  // Widget đếm thời gian động
+  Widget buildTimer(String? thoigian) {
+    if (thoigian == null || thoigian.isEmpty) return SizedBox();
+    return StreamBuilder<int>(
+      stream: Stream.periodic(Duration(seconds: 30), (i) => i),
+      builder: (context, snapshot) {
+        return Text(
+          "Thời gian: ${formatDurationFromIso(thoigian)}",
+          style: TextStyle(fontSize: 12, color: Colors.black54),
+        );
+      },
+    );
+  }
+
+  bool _isCountingTime(dynamic thoigian) {
+    return thoigian != null && thoigian != '';
+  }
+
+  // Khi nhấn "Đặt bàn", cập nhật thời gian bắt đầu cho bàn
+  Future<void> _onDatBan(Map<String, dynamic> ban) async {
+    if (ban['THOIGIAN'] == null || ban['THOIGIAN'] == '') {
+      await DatabaseHelper.update(
+        'BAN',
+        ban['MABAN'],
+        {'THOIGIAN': DateTime.now().toIso8601String()},
+        idColumn: 'MABAN',
+      );
+      await _loadBan();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -236,9 +286,15 @@ class _QL_BanState extends State<QL_Ban> {
                             ],
                           ),
                           const SizedBox(height: 8),
-                          Text(
-                            "Giờ: ${ban['GIO'] ?? 'N/A'}",
-                            style: TextStyle(fontSize: 12, color: Colors.black54),
+                          Row(
+                            children: [
+                              buildTimer(ban['THOIGIAN']),
+                              if (_isCountingTime(ban['THOIGIAN']))
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 6),
+                                  child: Icon(Icons.timer, color: Colors.green, size: 16),
+                                ),
+                            ],
                           ),
                           Text(
                             "Tổng tiền: ${_formatCurrency(tongTienBan)}",
@@ -249,13 +305,13 @@ class _QL_BanState extends State<QL_Ban> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               IconButton(
-                                icon: Icon(Icons.edit, size: 18), // Giảm size
-                                padding: EdgeInsets.zero, // Loại bỏ padding mặc định
-                                constraints: BoxConstraints(), // Loại bỏ constraints mặc định
+                                icon: Icon(Icons.edit, size: 18),
+                                padding: EdgeInsets.zero,
+                                constraints: BoxConstraints(),
                                 onPressed: () => _showEditDialog(ban),
                               ),
                               IconButton(
-                                icon: Icon(Icons.delete, size: 18), // Giảm size
+                                icon: Icon(Icons.delete, size: 18),
                                 padding: EdgeInsets.zero,
                                 constraints: BoxConstraints(),
                                 onPressed: () => _confirmDelete(ban['MABAN']),
@@ -263,23 +319,33 @@ class _QL_BanState extends State<QL_Ban> {
                               Flexible(
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2), // Thu nhỏ padding
-                                    textStyle: TextStyle(fontSize: 13), // Giảm font
+                                    padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+                                    textStyle: TextStyle(fontSize: 13),
                                     backgroundColor: const Color.fromARGB(255, 237, 235, 235),
-                                    minimumSize: Size(0, 32), // Giảm chiều cao tối thiểu
+                                    minimumSize: Size(0, 32),
                                   ),
-                                  onPressed: () {
+                                  onPressed: () async {
                                     if (trangThaiBan == 'Có khách' || trangThaiBan == 'Đang phục vụ') {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (_) => CheckoutScreen(
                                             tableNumber: ban['SOBAN'],
-                                            onCheckout: () => _loadBan(),
+                                            onCheckout: () async {
+                                              // Reset thời gian về rỗng sau khi thanh toán
+                                              await DatabaseHelper.update(
+                                                'BAN',
+                                                ban['MABAN'],
+                                                {'THOIGIAN': ''},
+                                                idColumn: 'MABAN',
+                                              );
+                                              _loadBan();
+                                            },
                                           ),
                                         ),
                                       ).then((_) => _loadBan());
                                     } else {
+                                      await _onDatBan(ban);
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -293,12 +359,20 @@ class _QL_BanState extends State<QL_Ban> {
                                         ? "Thanh toán"
                                         : "Đặt bàn",
                                     style: TextStyle(color: Color.fromARGB(255, 18, 18, 18)),
-                                    overflow: TextOverflow.ellipsis, // Nếu text dài sẽ có dấu ...
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ),
                             ],
                           ),
+                          if (_isCountingTime(ban['THOIGIAN']))
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Text(
+                                "Đang tính giờ",
+                                style: TextStyle(fontSize: 12, color: Colors.green, fontWeight: FontWeight.bold),
+                              ),
+                            ),
                         ],
                       ),
                     );

@@ -15,7 +15,7 @@ class DatabaseHelper {
 
   // Khởi tạo DB và copy từ assets nếu chưa có
   static Future<Database> _initDB() async {
-    const String dbName = 'doan2.db';
+    const String dbName = 'doan.db';
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, dbName);
 

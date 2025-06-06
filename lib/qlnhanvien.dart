@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'database_helper.dart'; // Đảm bảo đường dẫn này đúng
+import 'package:flutter/services.dart'; 
+import 'database_helper.dart'; 
 
 class QL_NhanVien extends StatefulWidget {
   const QL_NhanVien({super.key});
@@ -90,7 +91,15 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(controller: nameController, decoration: InputDecoration(labelText: "Họ tên")),
-            TextField(controller: phoneController, decoration: InputDecoration(labelText: "SĐT")),
+            TextField(
+              controller: phoneController,
+              decoration: InputDecoration(labelText: "SĐT"),
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(10),
+              ],
+            ),
             DropdownButtonFormField<int>(
               value: selectedMaCV,
               items: chucvuList.map((cv) => DropdownMenuItem<int>(
@@ -108,15 +117,25 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
           TextButton(onPressed: () => Navigator.pop(context), child: Text("Huỷ")),
           ElevatedButton(
             onPressed: () async {
-              if (nameController.text.isNotEmpty) {
-                await DatabaseHelper.insert('NHANVIEN', {
-                  'HOTEN': nameController.text,
-                  'SDT': phoneController.text,
-                  'MACV': selectedMaCV,
-                });
-                Navigator.pop(context);
-                _loadNhanVien();
+              if (nameController.text.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Vui lòng nhập họ tên')),
+                );
+                return;
               }
+              if (phoneController.text.length != 10) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('SĐT phải đủ 10 số')),
+                );
+                return;
+              }
+              await DatabaseHelper.insert('NHANVIEN', {
+                'HOTEN': nameController.text,
+                'SDT': phoneController.text,
+                'MACV': selectedMaCV,
+              });
+              Navigator.pop(context);
+              _loadNhanVien();
             },
             child: Text("Thêm"),
           ),
@@ -128,6 +147,7 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
   void _showEditDialog(Map<String, dynamic> employee) {
     TextEditingController nameController = TextEditingController(text: employee['HOTEN']);
     TextEditingController phoneController = TextEditingController(text: employee['SDT']);
+    int? selectedMaCV = employee['MACV'];
 
     showDialog(
       context: context,
@@ -137,10 +157,30 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(controller: nameController, decoration: InputDecoration(labelText: "Họ tên")),
-            TextField(controller: phoneController, decoration: InputDecoration(labelText: "SĐT")),
+            TextField(
+              controller: phoneController,
+              decoration: InputDecoration(labelText: "SĐT"),
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(10),
+              ],
+            ),
+            DropdownButtonFormField<int>(
+              value: selectedMaCV,
+              items: chucvuList.map((cv) => DropdownMenuItem<int>(
+                value: cv['MACV'],
+                child: Text(cv['TENCV']),
+              )).toList(),
+              onChanged: (value) {
+                selectedMaCV = value;
+              },
+              decoration: InputDecoration(labelText: "Chức vụ"),
+            ),
           ],
         ),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text("Huỷ")),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text("Huỷ")),
           ElevatedButton(
             onPressed: () async {
               await DatabaseHelper.update(
@@ -149,6 +189,7 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
                 {
                   'HOTEN': nameController.text,
                   'SDT': phoneController.text,
+                  'MACV': selectedMaCV,
                 },
                 idColumn: 'MANHANVIEN',
               );
@@ -420,26 +461,13 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                 ),
                                 SizedBox(height: 4),
-                                Text("SĐT: ${emp['SDT'] ?? ''}"),
+                                Text("Chức vụ: ${emp['TENCV'] ?? ''}"),
                               ],
                             ),
                           ),
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              DropdownButton<int>(
-                                value: emp['MACV'],
-                                items: chucvuList.map((cv) => DropdownMenuItem<int>(
-                                  value: cv['MACV'],
-                                  child: Text(cv['TENCV']),
-                                )).toList(),
-                                onChanged: (newValue) {
-                                  setState(() {
-                                    emp['MACV'] = newValue!;
-                                    updateChucVu(emp['MANHANVIEN'], newValue);
-                                  });
-                                },
-                              ),
                               IconButton(
                                 icon: Icon(Icons.edit, color: const Color.fromARGB(255, 81, 81, 81)),
                                 onPressed: () => _showEditDialog(emp),
