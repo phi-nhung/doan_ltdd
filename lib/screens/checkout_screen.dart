@@ -276,6 +276,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               finalCustomer!['MAKH'] = id;
               finalCustomer!.remove('isTemp');
 
+              // CẬP NHẬT ĐIỂM TÍCH LŨY cho khách hàng mới
+              await DatabaseHelper.rawUpdate(
+                'UPDATE KHACHHANG SET DIEMTL = ? WHERE MAKH = ?',
+                [cartProvider.calculatePoints(totalAmount).toInt(), id]
+              );
+
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Đã lưu thông tin khách hàng mới vào hệ thống')),
               );
