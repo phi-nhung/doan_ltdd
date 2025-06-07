@@ -410,6 +410,8 @@ class _DoanhThuState extends State<DoanhThu> {
 
   double _getHorizontalInterval() {
     double maxY = _getMaxY();
+    // Đảm bảo không trả về 0
+    if (maxY <= 0) return 1;
     return maxY / 5;
   }
 }
