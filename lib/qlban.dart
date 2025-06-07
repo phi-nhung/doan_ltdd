@@ -22,15 +22,14 @@ class _QL_BanState extends State<QL_Ban> {
   }
 
   Future<void> _loadBan() async {
+    // Không lọc "Đang phục vụ" ở SQL
     String where = "";
-    if (selectedTrangThai != 'Tất cả') {
+    if (selectedTrangThai != 'Tất cả' && selectedTrangThai != 'Đang phục vụ') {
       where = "WHERE BAN.TRANGTHAI = '$selectedTrangThai'";
     }
 
-    // Lấy ngày hôm nay theo định dạng yyyy-MM-dd
     final today = DateTime.now().toIso8601String().substring(0, 10);
 
-    // Lấy tổng tiền từ hóa đơn, thời gian từ trường THOIGIAN của BAN
     final data = await DatabaseHelper.rawQuery("""
        SELECT BAN.*, 
             IFNULL(SUM(CASE WHEN HOADON.NGAYTAO = ? THEN HOADON.TONGTIEN ELSE 0 END), 0) AS TONGTIEN
@@ -41,7 +40,23 @@ class _QL_BanState extends State<QL_Ban> {
       ORDER BY BAN.SOBAN
     """, [today, today]);
 
-    setState(() => dsBan = data);
+    // Nếu lọc "Đang phục vụ", lọc lại trên UI
+    if (selectedTrangThai == 'Đang phục vụ') {
+      final cartProvider = Provider.of<CartProvider>(context, listen: false);
+      setState(() => dsBan = data.where((ban) {
+        final soban = ban['SOBAN'];
+        return cartProvider.tableItems[soban]?.isNotEmpty == true;
+      }).toList());
+    } else if (selectedTrangThai == 'Đã đặt') {
+      final cartProvider = Provider.of<CartProvider>(context, listen: false);
+      setState(() => dsBan = data.where((ban) {
+        final soban = ban['SOBAN'];
+        // Chỉ lấy bàn ĐÃ ĐẶT mà KHÔNG có món trong giỏ hàng
+        return cartProvider.tableItems[soban]?.isEmpty != false;
+      }).toList());
+    } else {
+      setState(() => dsBan = data);
+    }
   }
 
   void _showAddDialog() {
@@ -63,7 +78,7 @@ class _QL_BanState extends State<QL_Ban> {
             DropdownButton<String>(
               value: trangThai,
               onChanged: (val) => setState(() => trangThai = val!),
-              items: ['Trống', 'Đã đặt', 'Có khách']
+              items: ['Trống', 'Đã đặt', 'Đang phục vụ']
                   .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                   .toList(),
             ),
@@ -111,7 +126,7 @@ class _QL_BanState extends State<QL_Ban> {
             DropdownButton<String>(
               value: trangThai,
               onChanged: (val) => setState(() => trangThai = val!),
-              items: ['Trống', 'Đã đặt', 'Có khách']
+              items: ['Trống', 'Đã đặt', 'Đang phục vụ']
                   .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                   .toList(),
             ),
@@ -169,10 +184,10 @@ class _QL_BanState extends State<QL_Ban> {
     switch (status) {
       case 'Trống':
         return Colors.green;
+      case 'Đang phục vụ':
+        return Colors.red; // hoặc Colors.orange tuỳ ý bạn
       case 'Đã đặt':
         return Colors.orange;
-      case 'Có khách':
-        return Colors.red;
       default:
         return Colors.grey;
     }
@@ -225,7 +240,10 @@ class _QL_BanState extends State<QL_Ban> {
       await DatabaseHelper.update(
         'BAN',
         ban['MABAN'],
-        {'THOIGIAN': DateTime.now().toIso8601String()},
+        {
+          'THOIGIAN': DateTime.now().toIso8601String(),
+          'TRANGTHAI': 'Đã đặt', // cập nhật trạng thái thành Đã đặt
+        },
         idColumn: 'MABAN',
       );
       await _loadBan();
@@ -243,10 +261,12 @@ class _QL_BanState extends State<QL_Ban> {
             child: DropdownButton<String>(
               value: selectedTrangThai,
               onChanged: (value) {
-                selectedTrangThai = value!;
-                _loadBan();
+                setState(() {
+                  selectedTrangThai = value!;
+                  _loadBan();
+                });
               },
-              items: ['Tất cả', 'Trống', 'Đã đặt', 'Có khách']
+              items: ['Tất cả', 'Trống', 'Đã đặt', 'Đang phục vụ']
                   .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                   .toList(),
             ),
@@ -325,18 +345,17 @@ class _QL_BanState extends State<QL_Ban> {
                                     minimumSize: Size(0, 32),
                                   ),
                                   onPressed: () async {
-                                    if (trangThaiBan == 'Có khách' || trangThaiBan == 'Đang phục vụ') {
+                                    if (trangThaiBan == 'Đang phục vụ') {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (_) => CheckoutScreen(
                                             tableNumber: ban['SOBAN'],
                                             onCheckout: () async {
-                                              // Reset thời gian về rỗng sau khi thanh toán
                                               await DatabaseHelper.update(
                                                 'BAN',
                                                 ban['MABAN'],
-                                                {'THOIGIAN': ''},
+                                                {'THOIGIAN': '', 'TRANGTHAI': 'Trống'},
                                                 idColumn: 'MABAN',
                                               );
                                               _loadBan();
@@ -344,7 +363,16 @@ class _QL_BanState extends State<QL_Ban> {
                                           ),
                                         ),
                                       ).then((_) => _loadBan());
+                                    } else if (trangThaiBan == 'Đã đặt') {
+                                      // Gọi món
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => OrderScreen(datban: ban['SOBAN']),
+                                        ),
+                                      ).then((_) => _loadBan());
                                     } else {
+                                      // Đặt bàn xong chuyển sang gọi món
                                       await _onDatBan(ban);
                                       Navigator.push(
                                         context,
@@ -355,9 +383,11 @@ class _QL_BanState extends State<QL_Ban> {
                                     }
                                   },
                                   child: Text(
-                                    (trangThaiBan == 'Có khách' || trangThaiBan == 'Đang phục vụ')
+                                    trangThaiBan == 'Đang phục vụ'
                                         ? "Thanh toán"
-                                        : "Đặt bàn",
+                                        : trangThaiBan == 'Đã đặt'
+                                            ? "Gọi món"
+                                            : "Đặt bàn",
                                     style: TextStyle(color: Color.fromARGB(255, 18, 18, 18)),
                                     overflow: TextOverflow.ellipsis,
                                   ),

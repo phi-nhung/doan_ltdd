@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:doan/database_helper.dart'; // Đảm bảo đường dẫn này đúng với file DatabaseHelper của bạn
+import 'package:doan/database_helper.dart';
 
 class CreateEmployeeAccountScreen extends StatefulWidget {
   const CreateEmployeeAccountScreen({Key? key}) : super(key: key);
@@ -9,19 +9,20 @@ class CreateEmployeeAccountScreen extends StatefulWidget {
 }
 
 class _CreateEmployeeAccountScreenState extends State<CreateEmployeeAccountScreen> {
-  // Controllers cho các trường nhập liệu
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _hotenController = TextEditingController();
   final TextEditingController _sdtController = TextEditingController();
 
-  // Danh sách các lựa chọn chức vụ
-  String _selectedChucVu = 'Nhân viên'; // Giá trị mặc định
-  final List<String> _chucVuOptions = ['Nhân viên', 'Quản lý']; // Có thể lấy từ DB nếu có bảng chức vụ
+  String _selectedChucVu = 'Nhân viên';
+  final List<String> _chucVuOptions = ['Nhân viên', 'Quản lý'];
+
+  Map<String, dynamic>? _nhanVienData;
+  bool _daCoTaiKhoan = false;
+  bool _dangTim = false;
 
   @override
   void dispose() {
-    // Giải phóng controllers khi widget không còn được sử dụng
     _usernameController.dispose();
     _passwordController.dispose();
     _hotenController.dispose();
@@ -32,60 +33,67 @@ class _CreateEmployeeAccountScreenState extends State<CreateEmployeeAccountScree
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 247, 247, 247), // Nền trắng sữa
+      backgroundColor: const Color.fromARGB(255, 247, 247, 247),
       appBar: AppBar(
-        title: const Text(
-          'Cấp Tài khoản Nhân viên',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.brown
+        title: const Text('Cấp Tài khoản Nhân viên', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.brown,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView( // Để tránh tràn màn hình khi bàn phím hiện lên
+        child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Trường Tên đăng nhập
-              _buildTextField(
-                controller: _usernameController,
-                labelText: 'Tên đăng nhập',
-                icon: Icons.person_outline,
-              ),
-              const SizedBox(height: 15),
-
-              // Trường Mật khẩu
-              _buildTextField(
-                controller: _passwordController,
-                labelText: 'Mật khẩu',
-                icon: Icons.lock_outline,
-                isPassword: true,
-              ),
-              const SizedBox(height: 15),
-
-              // Trường Họ tên
-              _buildTextField(
-                controller: _hotenController,
-                labelText: 'Họ tên',
-                icon: Icons.badge_outlined,
-              ),
-              const SizedBox(height: 15),
-
-              // Trường Số điện thoại
               _buildTextField(
                 controller: _sdtController,
                 labelText: 'Số điện thoại',
                 icon: Icons.phone_outlined,
                 keyboardType: TextInputType.phone,
+                onChanged: (value) async {
+                  if (value.length == 10 && !_dangTim) {
+                    _dangTim = true;
+                    final nhanvien = await DatabaseHelper.getItemByColumn('NHANVIEN', 'SDT', value);
+                    if (nhanvien != null) {
+                      final user = await DatabaseHelper.getItemByColumn('USER', 'MANV', nhanvien['MANHANVIEN']);
+                      setState(() {
+                        _nhanVienData = nhanvien;
+                        _hotenController.text = nhanvien['HOTEN'] ?? '';
+                        _selectedChucVu = (nhanvien['MACV'] == 1) ? 'Quản lý' : 'Nhân viên';
+                        _daCoTaiKhoan = user != null;
+                      });
+
+                      if (_daCoTaiKhoan) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Nhân viên này đã có tài khoản.')),
+                        );
+                      }
+                    } else {
+                      setState(() {
+                        _nhanVienData = null;
+                        _hotenController.clear();
+                        _selectedChucVu = 'Nhân viên';
+                        _daCoTaiKhoan = false;
+                      });
+                    }
+                    _dangTim = false;
+                  }
+                },
               ),
               const SizedBox(height: 15),
 
-              // Dropdown chọn Chức vụ
+              _buildTextField(
+                controller: _hotenController,
+                labelText: 'Họ tên',
+                icon: Icons.badge_outlined,
+                enabled: _nhanVienData == null,
+              ),
+              const SizedBox(height: 15),
+
               DropdownButtonFormField<String>(
                 value: _selectedChucVu,
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: const Color.fromARGB(255, 224, 224, 224), // Xám nhẹ
+                  fillColor: const Color.fromARGB(255, 224, 224, 224),
                   prefixIcon: const Icon(Icons.work_outline, color: Color.fromARGB(255, 42, 45, 50)),
                   labelText: 'Chức vụ',
                   labelStyle: const TextStyle(color: Color.fromARGB(255, 74, 74, 74)),
@@ -100,40 +108,69 @@ class _CreateEmployeeAccountScreenState extends State<CreateEmployeeAccountScree
                     child: Text(chucVu),
                   );
                 }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedChucVu = newValue!;
-                  });
-                },
+                onChanged: _nhanVienData == null
+                    ? (String? newValue) {
+                        setState(() {
+                          _selectedChucVu = newValue!;
+                        });
+                      }
+                    : null,
+              ),
+              const SizedBox(height: 15),
+
+              _buildTextField(
+                controller: _usernameController,
+                labelText: 'Tên đăng nhập',
+                icon: Icons.person_outline,
+                enabled: !_daCoTaiKhoan,
+              ),
+              const SizedBox(height: 15),
+
+              _buildTextField(
+                controller: _passwordController,
+                labelText: 'Mật khẩu (tối thiểu 6 ký tự)',
+                icon: Icons.lock_outline,
+                isPassword: true,
+                enabled: !_daCoTaiKhoan,
               ),
               const SizedBox(height: 30),
 
-              // Nút Tạo Tài khoản
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.brown, // Nâu mocha
+                    backgroundColor: Colors.brown,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
                   onPressed: () async {
-                    // Lấy dữ liệu từ controllers
+                    if (_daCoTaiKhoan) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Nhân viên này đã có tài khoản. Không thể tạo thêm.')),
+                      );
+                      return;
+                    }
+
                     final String username = _usernameController.text.trim();
                     final String password = _passwordController.text;
                     final String hoten = _hotenController.text.trim();
                     final String sdt = _sdtController.text.trim();
 
-                    // Kiểm tra validation cơ bản
                     if (username.isEmpty || password.isEmpty || hoten.isEmpty || sdt.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Vui lòng điền đầy đủ thông tin.')),
                       );
                       return;
                     }
-                    if (sdt.length < 10 || sdt.length > 11 || !RegExp(r'^[0-9]+$').hasMatch(sdt)) {
+
+                    if (password.length < 6) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Mật khẩu phải có ít nhất 6 ký tự.')),
+                      );
+                      return;
+                    }
+
+                    if (sdt.length != 10 || !RegExp(r'^[0-9]+$').hasMatch(sdt)) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Số điện thoại không hợp lệ.')),
                       );
@@ -141,47 +178,57 @@ class _CreateEmployeeAccountScreenState extends State<CreateEmployeeAccountScree
                     }
 
                     try {
-                      int chucVuValue = (_selectedChucVu == "Quản lý") ? 1 : 2;
-                      int manhanvienId = await DatabaseHelper.insert(
-                        'NHANVIEN',
-                        {
-                          'HOTEN': hoten,
-                          'MACV': chucVuValue, // 1 cho Quản lý, 2 cho Nhân viên
-                          'SDT': sdt,
-                        },
-                      );
+                      int manhanvienId;
 
-                      if (manhanvienId > 0) {
-                        int userId = await DatabaseHelper.insert(
-                          'USER',
+                      if (_nhanVienData != null) {
+                        manhanvienId = _nhanVienData!['MANHANVIEN'];
+                      } else {
+                        int chucVuValue = (_selectedChucVu == "Quản lý") ? 1 : 2;
+                        manhanvienId = await DatabaseHelper.insert(
+                          'NHANVIEN',
                           {
-                            'USERNAME': username,
-                            'PASSWORD': password,
-                            'MANV': manhanvienId, // Gán MANV từ NHANVIEN vừa tạo
+                            'HOTEN': hoten,
+                            'MACV': chucVuValue,
+                            'SDT': sdt,
                           },
                         );
 
-                        if (userId > 0) {
+                        if (manhanvienId <= 0) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Tạo tài khoản $username thành công!')),
+                            const SnackBar(content: Text('Tạo thông tin nhân viên thất bại.')),
                           );
-                          // Xóa dữ liệu trên form sau khi tạo thành công
-                          _usernameController.clear();
-                          _passwordController.clear();
-                          _hotenController.clear();
-                          _sdtController.clear();
-                          setState(() {
-                            _selectedChucVu = 'Nhân viên'; 
-                          });
-                        } else {
-                          await DatabaseHelper.delete('NHANVIEN', manhanvienId, idColumn: 'MANHANVIEN');
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Tạo tài khoản USER thất bại. Tên đăng nhập có thể đã tồn tại.')),
-                          );
+                          return;
                         }
-                      } else {
+                      }
+
+                      int userId = await DatabaseHelper.insert(
+                        'USER',
+                        {
+                          'USERNAME': username,
+                          'PASSWORD': password,
+                          'MANV': manhanvienId,
+                        },
+                      );
+
+                      if (userId > 0) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Tạo thông tin NHANVIEN thất bại.')),
+                          SnackBar(content: Text('Tạo tài khoản $username thành công!')),
+                        );
+                        _usernameController.clear();
+                        _passwordController.clear();
+                        _hotenController.clear();
+                        _sdtController.clear();
+                        setState(() {
+                          _selectedChucVu = 'Nhân viên';
+                          _nhanVienData = null;
+                          _daCoTaiKhoan = false;
+                        });
+                      } else {
+                        if (_nhanVienData == null) {
+                          await DatabaseHelper.delete('NHANVIEN', manhanvienId, idColumn: 'MANHANVIEN');
+                        }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Tạo tài khoản thất bại. Tên đăng nhập có thể đã tồn tại.')),
                         );
                       }
                     } catch (e) {
@@ -192,11 +239,7 @@ class _CreateEmployeeAccountScreenState extends State<CreateEmployeeAccountScree
                   },
                   child: const Text(
                     "Tạo Tài khoản",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ),
               ),
@@ -207,21 +250,24 @@ class _CreateEmployeeAccountScreenState extends State<CreateEmployeeAccountScree
     );
   }
 
-  // Hàm tiện ích để xây dựng TextField
   Widget _buildTextField({
     required TextEditingController controller,
     required String labelText,
     required IconData icon,
     bool isPassword = false,
     TextInputType keyboardType = TextInputType.text,
+    bool enabled = true,
+    void Function(String)? onChanged,
   }) {
     return TextField(
       controller: controller,
       obscureText: isPassword,
       keyboardType: keyboardType,
+      enabled: enabled,
+      onChanged: onChanged,
       decoration: InputDecoration(
         filled: true,
-        fillColor: const Color.fromARGB(255, 224, 224, 224), // Xám nhẹ
+        fillColor: const Color.fromARGB(255, 224, 224, 224),
         prefixIcon: Icon(icon, color: const Color.fromARGB(255, 42, 45, 50)),
         labelText: labelText,
         labelStyle: const TextStyle(color: Color.fromARGB(255, 74, 74, 74)),

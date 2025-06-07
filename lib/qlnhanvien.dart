@@ -123,9 +123,9 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
                 );
                 return;
               }
-              if (phoneController.text.length != 10) {
+              if (phoneController.text.length != 10 || !phoneController.text.startsWith('0')) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('SĐT phải đủ 10 số')),
+                  SnackBar(content: Text('SĐT phải đủ 10 số và bắt đầu bằng số 0')),
                 );
                 return;
               }

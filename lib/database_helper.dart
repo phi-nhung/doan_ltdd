@@ -106,4 +106,15 @@ class DatabaseHelper {
     final db = await database;
     return await db.rawUpdate(sql, arguments);
   }
+  static Future<Map<String, dynamic>?> getItemByColumn(String table, String column, dynamic value) async {
+  final db = await database;
+  final result = await db.query(table, where: '$column = ?', whereArgs: [value]);
+  if (result.isNotEmpty) {
+    return result.first;
+  }
+  return null;
+}
+
+
+
 }
