@@ -250,6 +250,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         minimumSize: Size(double.infinity, 50),
       ),
       onPressed: () async {
+        // Kiểm tra bắt buộc phải có thông tin khách hàng
+        if (_customer == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Vui lòng chọn hoặc thêm thông tin khách hàng trước khi thanh toán!')),
+          );
+          return;
+        }
         try {
           // Get correct items list based on table number
           final orderItems = widget.tableNumber != null 
@@ -267,7 +274,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   _tempCustomer!['HOTEN'],
                   _tempCustomer!['SDT'],
                   _tempCustomer!['DIACHI'] ?? '',
-                  _tempCustomer!['EMAIL'] ?? ''
+                  (_tempCustomer!['EMAIL'] == null || _tempCustomer!['EMAIL'].toString().isEmpty)
+                      ? null
+                      : _tempCustomer!['EMAIL']
                 ]
               );
 
