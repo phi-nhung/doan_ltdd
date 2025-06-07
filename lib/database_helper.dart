@@ -67,14 +67,9 @@ class DatabaseHelper {
     }
   }
 
-  static Future<int> delete(String table, int id, {String idColumn = 'id'}) async {
+  static Future<int> delete(String table, dynamic id, {String idColumn = 'id'}) async {
     final db = await database;
-    try {
-      return await db.delete(table, where: '$idColumn = ?', whereArgs: [id]);
-    } catch (e) {
-      print("Lỗi delete: $e");
-      return 0;
-    }
+    return await db.delete(table, where: '$idColumn = ?', whereArgs: [id]);
   }
 
   static Future<List<Map<String, dynamic>>> getAll(String table) async {

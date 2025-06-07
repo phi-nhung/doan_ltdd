@@ -206,16 +206,15 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
   // Sửa đổi hàm _deleteEmployee để xóa cả trong bảng USER
   void _deleteEmployee(int manv) async {
     try {
-      // Bước 1: Xóa tài khoản USER liên quan
       // Tìm USER có MANV tương ứng với MANHANVIEN của nhân viên
       final userResult = await DatabaseHelper.rawQuery(
-        'SELECT ID FROM USER WHERE MANV = ?',
+        'SELECT USERNAME FROM USER WHERE MANV = ?',
         [manv],
       );
 
       if (userResult.isNotEmpty) {
-        int userIdToDelete = userResult.first['ID'];
-        await DatabaseHelper.delete('USER', userIdToDelete, idColumn: 'ID');
+        String usernameToDelete = userResult.first['USERNAME'];
+        await DatabaseHelper.delete('USER', usernameToDelete, idColumn: 'USERNAME');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Đã xóa tài khoản người dùng liên quan.')),
         );
@@ -225,7 +224,7 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
         );
       }
 
-      // Bước 2: Xóa nhân viên khỏi bảng NHANVIEN
+      // Xóa nhân viên khỏi bảng NHANVIEN
       await DatabaseHelper.delete('NHANVIEN', manv, idColumn: 'MANHANVIEN');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Đã xóa nhân viên thành công.')),
@@ -235,7 +234,7 @@ class _QL_NhanVienState extends State<QL_NhanVien> {
         SnackBar(content: Text('Lỗi khi xóa nhân viên: ${e.toString()}')),
       );
     } finally {
-      _loadNhanVien(); // Tải lại danh sách nhân viên sau khi xóa
+      _loadNhanVien();
     }
   }
 
