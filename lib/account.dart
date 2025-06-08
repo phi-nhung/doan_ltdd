@@ -189,15 +189,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   obscureText: true,
                   decoration: const InputDecoration(labelText: "Mật khẩu hiện tại"),
                 ),
-                TextField(
+               TextFormField(
                   controller: newPasswordController,
                   obscureText: true,
                   decoration: const InputDecoration(labelText: "Mật khẩu mới"),
+                  validator: (value) {
+                    if (value == null || value.length < 6) {
+                      return 'Mật khẩu phải có ít nhất 6 ký tự';
+                    }
+                    return null;
+                  },
                 ),
-                TextField(
+                TextFormField(
                   controller: confirmPasswordController,
                   obscureText: true,
                   decoration: const InputDecoration(labelText: "Xác nhận mật khẩu mới"),
+                  validator: (value) {
+                    if (value == null || value.length < 6) {
+                      return 'Mật khẩu phải có ít nhất 6 ký tự';
+                    } else if (value != newPasswordController.text) {
+                      return 'Mật khẩu xác nhận không khớp';
+                    }
+                    return null;
+                  },
                 ),
               ],
             ),
