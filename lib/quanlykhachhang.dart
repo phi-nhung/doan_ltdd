@@ -37,52 +37,49 @@ class _QL_KhachHangState extends State<QL_KhachHang> {
 
   Future<void> _loadCustomers() async {
     final data = await DatabaseHelper.rawQuery('''
-      SELECT KH.MAKH, KH.HOTEN, KH.SDT, KH.DIEMTL, MAX(HD.NGAYTAO) AS NGAYTAO
+      SELECT KH.MAKH, KH.HOTEN, KH.SDT, KH.DIACHI, KH.EMAIL, KH.DIEMTL, MAX(HD.NGAYTAO) AS NGAYTAO
       FROM KHACHHANG KH
       LEFT JOIN HOADON HD ON KH.MAKH = HD.MAKH
       GROUP BY KH.MAKH
     ''');
-
     setState(() {
       _customers = data;
       _applyFilters();
     });
   }
 
-void _applyFilters() {
-  final now = DateTime.now();
-  final today = DateTime(now.year, now.month, now.day);
-  final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-  final startOfWeekDate = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
+  void _applyFilters() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    final startOfWeekDate = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
 
-  List<Map<String, dynamic>> filtered = List.from(_customers);
+    List<Map<String, dynamic>> filtered = List.from(_customers);
 
-  // Áp dụng bộ lọc thời gian
-  switch (_selectedFilter) {
-    case 'Hôm nay':
-      filtered = filtered.where((item) {
-        if (item['NGAYTAO'] == null) return false;
-        final date = DateTime.tryParse(item['NGAYTAO'])?.toLocal();
-        if (date == null) return false;
-        final itemDate = DateTime(date.year, date.month, date.day);
-        return itemDate == today;
-      }).toList();
-      break;
-    case 'Tuần này':
-      filtered = filtered.where((item) {
-        if (item['NGAYTAO'] == null) return false;
-        final date = DateTime.tryParse(item['NGAYTAO'])?.toLocal();
-        if (date == null) return false;
-        final itemDate = DateTime(date.year, date.month, date.day);
-        return itemDate.isAfter(startOfWeekDate) || itemDate == startOfWeekDate;
-      }).toList();
-      break;
-    default:
-      // Không lọc
-      break;
-  }
+    // Áp dụng bộ lọc thời gian
+    switch (_selectedFilter) {
+      case 'Hôm nay':
+        filtered = filtered.where((item) {
+          if (item['NGAYTAO'] == null) return false;
+          final date = DateTime.tryParse(item['NGAYTAO'])?.toLocal();
+          if (date == null) return false;
+          final itemDate = DateTime(date.year, date.month, date.day);
+          return itemDate == today;
+        }).toList();
+        break;
+      case 'Tuần này':
+        filtered = filtered.where((item) {
+          if (item['NGAYTAO'] == null) return false;
+          final date = DateTime.tryParse(item['NGAYTAO'])?.toLocal();
+          if (date == null) return false;
+          final itemDate = DateTime(date.year, date.month, date.day);
+          return itemDate.isAfter(startOfWeekDate) || itemDate == startOfWeekDate;
+        }).toList();
+        break;
+      default:
+        break;
+    }
 
-       
     // Áp dụng tìm kiếm
     if (_searchQuery.isNotEmpty) {
       filtered = filtered.where((customer) {
@@ -95,43 +92,87 @@ void _applyFilters() {
       _filteredCustomers = filtered;
     });
   }
-    void _showAddDialog() {
+  void _showAddDialog() {
     TextEditingController nameController = TextEditingController();
     TextEditingController phoneController = TextEditingController();
     TextEditingController addressController = TextEditingController();
     TextEditingController emailController = TextEditingController();
+    String? nameError, phoneError, emailError;
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text("Thêm khách hàng"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: nameController, decoration: InputDecoration(labelText: "Họ tên")),
-            TextField(controller: phoneController, decoration: InputDecoration(labelText: "SĐT")),
-            TextField(controller: addressController, decoration: InputDecoration(labelText: "Địa chỉ")),
-            TextField(controller: emailController, decoration: InputDecoration(labelText: "Email")),
+      builder: (_) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Text("Thêm khách hàng"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: "Họ tên",
+                  errorText: nameError,
+                ),
+              ),
+              TextField(
+                controller: phoneController,
+                decoration: InputDecoration(
+                  labelText: "SĐT",
+                  errorText: phoneError,
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
+                controller: addressController,
+                decoration: InputDecoration(labelText: "Địa chỉ"),
+              ),
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  labelText: "Email",
+                  errorText: emailError,
+                ),
+                keyboardType: TextInputType.emailAddress,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: Text("Huỷ")),
+            ElevatedButton(
+              onPressed: () async {
+                final phone = phoneController.text.trim();
+                final email = emailController.text.trim();
+                final name = nameController.text.trim();
+                String? nError, pError, eError;
+                if (name.isEmpty) {
+                  nError = "Vui lòng nhập họ tên";
+                }
+                if (!RegExp(r'^\d{10}$').hasMatch(phone)) {
+                  pError = "SĐT không hợp lệ!!!";
+                }
+                if (!email.endsWith('@gmail.com')) {
+                  eError = "Email không hợp lệ!!!";
+                }
+                setState(() {
+                  nameError = nError;
+                  phoneError = pError;
+                  emailError = eError;
+                });
+                if (nError != null || pError != null || eError != null) return;
+                print('Thêm khách hàng: $name, $phone, $email');
+                await DatabaseHelper.insert('KHACHHANG', {
+                  'HOTEN': name,
+                  'SDT': phone,
+                  'DIACHI': addressController.text,
+                  'EMAIL': email,
+                });
+                await _loadCustomers();
+                Navigator.pop(context);
+              },
+              child: Text("Thêm"),
+            ),
           ],
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text("Huỷ")),
-          ElevatedButton(
-            onPressed: () async {
-              if (nameController.text.isNotEmpty) {
-                await DatabaseHelper.insert('KHACHHANG', {
-                  'HOTEN': nameController.text,
-                  'SDT': phoneController.text,
-                  'DIACHI': addressController.text,
-                  'EMAIL': emailController.text,
-                });
-                Navigator.pop(context);
-                _loadCustomers();
-              }
-            },
-            child: Text("Thêm"),
-          ),
-        ],
       ),
     );
   }
@@ -139,37 +180,92 @@ void _applyFilters() {
   void _showEditDialog(Map<String, dynamic> customer) {
     TextEditingController nameController = TextEditingController(text: customer['HOTEN']);
     TextEditingController phoneController = TextEditingController(text: customer['SDT']);
+    TextEditingController addressController = TextEditingController(text: customer['DIACHI'] ?? '');
+    TextEditingController emailController = TextEditingController(text: customer['EMAIL'] ?? '');
+    String? nameError, phoneError, emailError;
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text("Sửa khách hàng"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: nameController, decoration: InputDecoration(labelText: "Họ tên")),
-            TextField(controller: phoneController, decoration: InputDecoration(labelText: "SĐT")),
+      builder: (_) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Text("Sửa khách hàng"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: "Họ tên",
+                  errorText: nameError,
+                ),
+              ),
+              TextField(
+                controller: phoneController,
+                decoration: InputDecoration(
+                  labelText: "SĐT",
+                  errorText: phoneError,
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
+                controller: addressController,
+                decoration: InputDecoration(labelText: "Địa chỉ"),
+              ),
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  labelText: "Email",
+                  errorText: emailError,
+                ),
+                keyboardType: TextInputType.emailAddress,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: Text("Huỷ")),
+            ElevatedButton(
+              onPressed: () async {
+                final phone = phoneController.text.trim();
+                final name = nameController.text.trim();
+                final address = addressController.text.trim();
+                final email = emailController.text.trim();
+                bool hasError = false;
+                setState(() {
+                  nameError = null;
+                  phoneError = null;
+                  emailError = null;
+                  if (name.isEmpty) {
+                    nameError = "Vui lòng nhập họ tên";
+                    hasError = true;
+                  }
+                  if (!RegExp(r'^\d{10}$').hasMatch(phone)) {
+                    phoneError = "SĐT phải là 10 chữ số";
+                    hasError = true;
+                  }
+                  if (!email.endsWith('@gmail.com')) {
+                    emailError = "Email phải có @gmail.com";
+                    hasError = true;
+                  }
+                });
+                if (hasError) return;
+                await DatabaseHelper.update(
+                  'KHACHHANG',
+                  customer['MAKH'],
+                  {
+                    'HOTEN': name,
+                    'SDT': phone,
+                    'DIACHI': address,
+                    'EMAIL': email,
+                  },
+                  idColumn: 'MAKH',
+                );
+                Navigator.pop(context);
+                _loadCustomers();
+              },
+              child: Text("Cập nhật"),
+            ),
           ],
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text("Huỷ")),
-          ElevatedButton(
-            onPressed: () async {
-              await DatabaseHelper.update(
-                'KHACHHANG',
-                customer['MAKH'],
-                {
-                  'HOTEN': nameController.text,
-                  'SDT': phoneController.text,
-                },
-                idColumn: 'MAKH',
-              );
-              Navigator.pop(context);
-              _loadCustomers();
-            },
-            child: Text("Cập nhật"),
-          ),
-        ],
       ),
     );
   }
@@ -254,6 +350,39 @@ void _applyFilters() {
                   child: InkWell(
                     onTap: () {
                       // Có thể thêm hành động khi nhấn vào khách hàng
+                    },
+                    onDoubleTap: () async {
+                      final makh = customer['MAKH'];
+                      // Lấy chi tiết khách hàng từ database
+                      final detailList = await DatabaseHelper.rawQuery('''
+                        SELECT HOTEN, SDT, DIACHI, EMAIL, DIEMTL FROM KHACHHANG WHERE MAKH = ?
+                      ''', [makh]);
+                      if (detailList.isNotEmpty) {
+                        final detail = detailList.first;
+                        showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            title: Text('Thông tin chi tiết'),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Họ tên: 	${detail['HOTEN'] ?? ''}'),
+                                Text('SĐT: 	${detail['SDT'] ?? ''}'),
+                                Text('Địa chỉ: 	${detail['DIACHI'] ?? ''}'),
+                                Text('Email: 	${detail['EMAIL'] ?? ''}'),
+                                Text('Điểm tích lũy: 	${detail['DIEMTL'] ?? '0'}'),
+                              ],
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text('Đóng'),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
