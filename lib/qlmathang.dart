@@ -95,10 +95,72 @@ class _QL_MatHangState extends State<QL_MatHang> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(controller: nameController, decoration: InputDecoration(labelText: "Tên sản phẩm")),
-                TextField(controller: priceController, decoration: InputDecoration(labelText: "Giá bán"), keyboardType: TextInputType.number),
-                TextField(controller: unitController, decoration: InputDecoration(labelText: "Đơn vị tính")),
-                TextField(controller: quantityController, decoration: InputDecoration(labelText: "Số lượng tồn"), keyboardType: TextInputType.number),
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: "Tên sản phẩm",
+                    errorText: nameController.text.isEmpty ? 'Vui lòng nhập tên sản phẩm' : null,
+                  ),
+                ),
+                TextField(
+                  controller: priceController,
+                  decoration: InputDecoration(
+                    labelText: "Giá bán",
+                    errorText: priceController.text.isEmpty ? 'Vui lòng nhập giá bán' : null,
+                  ),
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  onChanged: (value) {
+                    if (value.startsWith('-')) {
+                      priceController.text = value.replaceFirst('-', '');
+                      priceController.selection = TextSelection.fromPosition(
+                        TextPosition(offset: priceController.text.length),
+                      );
+                    }
+                    // Chỉ cho phép nhập số và dấu chấm
+                    if (value.isNotEmpty) {
+                      final regex = RegExp(r'^\d*\.?\d*$');
+                      if (!regex.hasMatch(value)) {
+                        priceController.text = value.replaceAll(RegExp(r'[^\d.]'), '');
+                        priceController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: priceController.text.length),
+                        );
+                      }
+                    }
+                  },
+                ),
+                TextField(
+                  controller: unitController,
+                  decoration: InputDecoration(
+                    labelText: "Đơn vị tính",
+                    errorText: unitController.text.isEmpty ? 'Vui lòng nhập đơn vị tính' : null,
+                  ),
+                ),
+                TextField(
+                  controller: quantityController,
+                  decoration: InputDecoration(
+                    labelText: "Số lượng tồn",
+                    errorText: quantityController.text.isEmpty ? 'Vui lòng nhập số lượng' : null,
+                  ),
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    if (value.startsWith('-')) {
+                      quantityController.text = value.replaceFirst('-', '');
+                      quantityController.selection = TextSelection.fromPosition(
+                        TextPosition(offset: quantityController.text.length),
+                      );
+                    }
+                    // Chỉ cho phép nhập số nguyên
+                    if (value.isNotEmpty) {
+                      final regex = RegExp(r'^\d*$');
+                      if (!regex.hasMatch(value)) {
+                        quantityController.text = value.replaceAll(RegExp(r'[^\d]'), '');
+                        quantityController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: quantityController.text.length),
+                        );
+                      }
+                    }
+                  },
+                ),
                 DropdownButtonFormField<int>(
                   value: selectedMaDanhMuc,
                   items: danhmuc.map((dm) => DropdownMenuItem<int>(
@@ -157,19 +219,58 @@ class _QL_MatHangState extends State<QL_MatHang> {
             TextButton(onPressed: () => Navigator.pop(context), child: Text("Huỷ")),
             ElevatedButton(
               onPressed: () async {
-                if (nameController.text.isNotEmpty && selectedMaDanhMuc != null) {
-                  await DatabaseHelper.insert('SANPHAM', {
-                    'TENSANPHAM': nameController.text,
-                    'DONVITINH': unitController.text,
-                    'GIABAN': double.tryParse(priceController.text) ?? 0,
-                    'SOLUONGTON': int.tryParse(quantityController.text) ?? 0,
-                    'TRANGTHAI': trangthai,
-                    'MADANHMUC': selectedMaDanhMuc,
-                    'HINHANH': pickedImage,
-                  });
-                  Navigator.pop(context);
-                  _loadMatHang();
+                if (nameController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Vui lòng nhập tên sản phẩm')),
+                  );
+                  return;
                 }
+                if (priceController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Vui lòng nhập giá bán')),
+                  );
+                  return;
+                }
+                if (unitController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Vui lòng nhập đơn vị tính')),
+                  );
+                  return;
+                }
+                if (quantityController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Vui lòng nhập số lượng')),
+                  );
+                  return;
+                }
+                if (selectedMaDanhMuc == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Vui lòng chọn danh mục')),
+                  );
+                  return;
+                }
+
+                final price = double.tryParse(priceController.text) ?? 0;
+                final quantity = int.tryParse(quantityController.text) ?? 0;
+                
+                if (price <= 0 || quantity < 0) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Giá bán phải lớn hơn 0 và số lượng không được âm!')),
+                  );
+                  return;
+                }
+
+                await DatabaseHelper.insert('SANPHAM', {
+                  'TENSANPHAM': nameController.text,
+                  'DONVITINH': unitController.text,
+                  'GIABAN': price,
+                  'SOLUONGTON': quantity,
+                  'TRANGTHAI': trangthai,
+                  'MADANHMUC': selectedMaDanhMuc,
+                  'HINHANH': pickedImage,
+                });
+                Navigator.pop(context);
+                _loadMatHang();
               },
               child: Text("Thêm"),
             ),
@@ -197,10 +298,72 @@ class _QL_MatHangState extends State<QL_MatHang> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(controller: nameController, decoration: InputDecoration(labelText: "Tên sản phẩm")),
-                TextField(controller: priceController, decoration: InputDecoration(labelText: "Giá bán"), keyboardType: TextInputType.number),
-                TextField(controller: unitController, decoration: InputDecoration(labelText: "Đơn vị tính")),
-                TextField(controller: quantityController, decoration: InputDecoration(labelText: "Số lượng tồn"), keyboardType: TextInputType.number),
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: "Tên sản phẩm",
+                    errorText: nameController.text.isEmpty ? 'Vui lòng nhập tên sản phẩm' : null,
+                  ),
+                ),
+                TextField(
+                  controller: priceController,
+                  decoration: InputDecoration(
+                    labelText: "Giá bán",
+                    errorText: priceController.text.isEmpty ? 'Vui lòng nhập giá bán' : null,
+                  ),
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  onChanged: (value) {
+                    if (value.startsWith('-')) {
+                      priceController.text = value.replaceFirst('-', '');
+                      priceController.selection = TextSelection.fromPosition(
+                        TextPosition(offset: priceController.text.length),
+                      );
+                    }
+                    // Chỉ cho phép nhập số và dấu chấm
+                    if (value.isNotEmpty) {
+                      final regex = RegExp(r'^\d*\.?\d*$');
+                      if (!regex.hasMatch(value)) {
+                        priceController.text = value.replaceAll(RegExp(r'[^\d.]'), '');
+                        priceController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: priceController.text.length),
+                        );
+                      }
+                    }
+                  },
+                ),
+                TextField(
+                  controller: unitController,
+                  decoration: InputDecoration(
+                    labelText: "Đơn vị tính",
+                    errorText: unitController.text.isEmpty ? 'Vui lòng nhập đơn vị tính' : null,
+                  ),
+                ),
+                TextField(
+                  controller: quantityController,
+                  decoration: InputDecoration(
+                    labelText: "Số lượng tồn",
+                    errorText: quantityController.text.isEmpty ? 'Vui lòng nhập số lượng' : null,
+                  ),
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    if (value.startsWith('-')) {
+                      quantityController.text = value.replaceFirst('-', '');
+                      quantityController.selection = TextSelection.fromPosition(
+                        TextPosition(offset: quantityController.text.length),
+                      );
+                    }
+                    // Chỉ cho phép nhập số nguyên
+                    if (value.isNotEmpty) {
+                      final regex = RegExp(r'^\d*$');
+                      if (!regex.hasMatch(value)) {
+                        quantityController.text = value.replaceAll(RegExp(r'[^\d]'), '');
+                        quantityController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: quantityController.text.length),
+                        );
+                      }
+                    }
+                  },
+                ),
                 DropdownButtonFormField<int>(
                   value: selectedMaDanhMuc,
                   items: danhmuc.map((dm) => DropdownMenuItem<int>(
@@ -259,14 +422,49 @@ class _QL_MatHangState extends State<QL_MatHang> {
             TextButton(onPressed: () => Navigator.pop(context), child: Text("Huỷ")),
             ElevatedButton(
               onPressed: () async {
+                if (nameController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Vui lòng nhập tên sản phẩm')),
+                  );
+                  return;
+                }
+                if (priceController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Vui lòng nhập giá bán')),
+                  );
+                  return;
+                }
+                if (unitController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Vui lòng nhập đơn vị tính')),
+                  );
+                  return;
+                }
+                if (quantityController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Vui lòng nhập số lượng')),
+                  );
+                  return;
+                }
+
+                final price = double.tryParse(priceController.text) ?? 0;
+                final quantity = int.tryParse(quantityController.text) ?? 0;
+                
+                if (price <= 0 || quantity < 0) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Giá bán phải lớn hơn 0 và số lượng không được âm!')),
+                  );
+                  return;
+                }
+
                 await DatabaseHelper.update(
                   'SANPHAM',
                   item['MASANPHAM'],
                   {
                     'TENSANPHAM': nameController.text,
                     'DONVITINH': unitController.text,
-                    'GIABAN': double.tryParse(priceController.text) ?? 0,
-                    'SOLUONGTON': int.tryParse(quantityController.text) ?? 0,
+                    'GIABAN': price,
+                    'SOLUONGTON': quantity,
                     'TRANGTHAI': trangthai,
                     'MADANHMUC': selectedMaDanhMuc,
                     'HINHANH': pickedImage,
