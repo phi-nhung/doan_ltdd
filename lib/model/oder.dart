@@ -46,19 +46,24 @@ class Order {
   }
 
   factory Order.fromMap(Map<String, dynamic> map) {
+    int? parseInt(dynamic value) {
+      if (value == null) return null;
+      if (value is int) return value;
+      return int.tryParse(value.toString());
+    }
     return Order(
-      mahd: map['MAHD'] as int?,
+      mahd: parseInt(map['MAHD']),
       ngaytao: DateTime.parse(map['NGAYTAO'] as String),
       tongtien: (map['TONGTIEN'] as num?)?.toDouble() ?? 0.0,
-      diemcong: map['DIEMCONG'] as int? ?? 0,
+      diemcong: parseInt(map['DIEMCONG']) ?? 0,
       hinhthucmua: map['HINHTHUCMUA'] as String? ?? '',
-      makh: map['MAKH'] as int? ?? -1,
-      manv: map['MANV'] as int?,
-      maban: map['MABAN'] as int?,
+      makh: parseInt(map['MAKH']) ?? -1,
+      manv: parseInt(map['MANV']),
+      maban: parseInt(map['MABAN']),
       tenKhachHang: map['HOTEN'] as String?,
       hoTenNhanVien: map['HOTENNHANVIEN'] as String?,
-      soBan: map['SOBAN'] as int?,
-      sdt: map['SDT'] as String?, // Lấy từ alias SDTKH trong truy vấn SQL
+      soBan: parseInt(map['SOBAN']),
+      sdt: map['SDT'] as String?,
     );
   }
 }

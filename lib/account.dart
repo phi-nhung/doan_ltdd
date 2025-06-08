@@ -226,7 +226,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 final oldPass = oldPasswordController.text;
                 final newPass = newPasswordController.text;
                 final confirmPass = confirmPasswordController.text;
-
+                if (oldPass.isEmpty || newPass.isEmpty || confirmPass.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Vui lòng điền đầy đủ thông tin")),
+                  );
+                  return;
+                }
+                if (newPass.length < 6 || confirmPass.length < 6) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Mật khẩu phải có ít nhất 6 ký tự")),
+                  );
+                  return;
+                }
                 if (newPass != confirmPass) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Mật khẩu xác nhận không khớp")),
