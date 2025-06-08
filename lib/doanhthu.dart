@@ -38,7 +38,7 @@ class _DoanhThuState extends State<DoanhThu> {
         final nextHour = i < timeSlots.length - 1 ? timeSlots[i + 1] : 24;
         final dateStr = DateFormat('yyyy-MM-dd').format(now);
         futures.add(DatabaseHelper.rawQuery(
-          "SELECT hd.TONGTIEN, hd.MAKH, kh.HOTEN FROM HOADON hd "
+          "SELECT hd.MAHD, hd.TONGTIEN, hd.MAKH, kh.HOTEN FROM HOADON hd "
           "LEFT JOIN KHACHHANG kh ON hd.MAKH = kh.MAKH "
           "WHERE DATE(hd.NGAYTAO) = '$dateStr' "
           "AND CAST(strftime('%H', hd.NGAYTAO) AS INTEGER) >= $hour "
@@ -46,20 +46,18 @@ class _DoanhThuState extends State<DoanhThu> {
         ));
       }
       final results = await Future.wait(futures);
-      final customerMap = <String, Map<String, dynamic>>{};
       for (int i = 0; i < results.length; i++) {
-        final dailyData = results[i];
+        final hourlyData = results[i];
         double hourlyTotal = 0;
-        for (var item in dailyData) {
-          final maKH = item['MAKH']?.toString() ?? 'null';
-          final hoten = item['HOTEN'] ?? 'Khách vãng lai';
+        for (var item in hourlyData) {
           final tongTien = (item['TONGTIEN'] ?? 0).toDouble();
           hourlyTotal += tongTien;
-          if (customerMap.containsKey(maKH)) {
-            customerMap[maKH]!['TONGTIEN'] += tongTien;
-          } else {
-            customerMap[maKH] = {'HOTEN': hoten, 'TONGTIEN': tongTien};
-          }
+          _customerList.add({
+            'MAHD': item['MAHD'],
+            'MAKH': item['MAKH']?.toString() ?? 'null',
+            'HOTEN': item['HOTEN'] ?? 'Khách vãng lai',
+            'TONGTIEN': tongTien
+          });
         }
         _barGroups.add(
           BarChartGroupData(
@@ -69,7 +67,6 @@ class _DoanhThuState extends State<DoanhThu> {
         );
         _totalRevenue += hourlyTotal;
       }
-      _customerList = customerMap.values.toList();
       _totalCustomers = _customerList.length;
     } else if (_selectedFilter == 'Tuần') {
       final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
@@ -78,28 +75,23 @@ class _DoanhThuState extends State<DoanhThu> {
         final day = startOfWeek.add(Duration(days: i));
         final dateStr = DateFormat('yyyy-MM-dd').format(day);
         futures.add(DatabaseHelper.rawQuery(
-          "SELECT hd.TONGTIEN, hd.MAKH, kh.HOTEN, hd.NGAYTAO FROM HOADON hd "
+          "SELECT hd.MAHD, hd.TONGTIEN, hd.MAKH, kh.HOTEN, hd.NGAYTAO FROM HOADON hd "
           "LEFT JOIN KHACHHANG kh ON hd.MAKH = kh.MAKH "
           "WHERE DATE(hd.NGAYTAO) = '$dateStr'"
         ));
       }
       final results = await Future.wait(futures);
       double totalRevenueSelectedDay = 0;
-      final customerMap = <String, Map<String, dynamic>>{};
       // Lọc đúng hóa đơn của ngày đang chọn
       final selectedDayData = results[_selectedWeekday];
       for (var item in selectedDayData) {
         final tongTien = (item['TONGTIEN'] ?? 0).toDouble();
-        final maKH = item['MAKH']?.toString() ?? 'null';
-        final hoten = item['HOTEN'] ?? 'Khách vãng lai';
-        final ngayTao = item['NGAYTAO']?.toString() ?? '';
-        // Debug log để kiểm tra dữ liệu từng hóa đơn
-        print('[DEBUG] Thứ ${_selectedWeekday + 2} - MAKH: $maKH, HOTEN: $hoten, TONGTIEN: $tongTien, NGAYTAO: $ngayTao');
-        if (customerMap.containsKey(maKH)) {
-          customerMap[maKH]!['TONGTIEN'] += tongTien;
-        } else {
-          customerMap[maKH] = {'HOTEN': hoten, 'TONGTIEN': tongTien};
-        }
+        _customerList.add({
+          'MAHD': item['MAHD'],
+          'MAKH': item['MAKH']?.toString() ?? 'null',
+          'HOTEN': item['HOTEN'] ?? 'Khách vãng lai',
+          'TONGTIEN': tongTien
+        });
         totalRevenueSelectedDay += tongTien;
       }
       // Biểu đồ vẫn hiển thị đủ 7 ngày
@@ -117,14 +109,13 @@ class _DoanhThuState extends State<DoanhThu> {
         );
       }
       _totalRevenue = totalRevenueSelectedDay;
-      _customerList = customerMap.values.toList();
       _totalCustomers = _customerList.length;
     } else if (_selectedFilter == 'Tháng') {
       final year = now.year;
       List<Future<List<Map<String, dynamic>>>> futures = [];
       for (int m = 1; m <= 12; m++) {
         futures.add(DatabaseHelper.rawQuery(
-          "SELECT hd.TONGTIEN, hd.MAKH, kh.HOTEN, hd.NGAYTAO FROM HOADON hd "
+          "SELECT hd.MAHD, hd.TONGTIEN, hd.MAKH, kh.HOTEN, hd.NGAYTAO FROM HOADON hd "
           "LEFT JOIN KHACHHANG kh ON hd.MAKH = kh.MAKH "
           "WHERE strftime('%Y', hd.NGAYTAO) = '$year' "
           "AND strftime('%m', hd.NGAYTAO) = '${m.toString().padLeft(2, '0')}'"
@@ -132,18 +123,16 @@ class _DoanhThuState extends State<DoanhThu> {
       }
       final results = await Future.wait(futures);
       double totalRevenueSelectedMonth = 0;
-      final customerMap = <String, Map<String, dynamic>>{};
       // Lọc đúng hóa đơn của tháng đang chọn
       final selectedMonthData = results[_selectedMonth - 1];
       for (var item in selectedMonthData) {
         final tongTien = (item['TONGTIEN'] ?? 0).toDouble();
-        final maKH = item['MAKH']?.toString() ?? 'null';
-        final hoten = item['HOTEN'] ?? 'Khách vãng lai';
-        if (customerMap.containsKey(maKH)) {
-          customerMap[maKH]!['TONGTIEN'] += tongTien;
-        } else {
-          customerMap[maKH] = {'HOTEN': hoten, 'TONGTIEN': tongTien};
-        }
+        _customerList.add({
+          'MAHD': item['MAHD'],
+          'MAKH': item['MAKH']?.toString() ?? 'null',
+          'HOTEN': item['HOTEN'] ?? 'Khách vãng lai',
+          'TONGTIEN': tongTien
+        });
         totalRevenueSelectedMonth += tongTien;
       }
       // Biểu đồ vẫn hiển thị đủ 12 tháng
@@ -161,7 +150,6 @@ class _DoanhThuState extends State<DoanhThu> {
         );
       }
       _totalRevenue = totalRevenueSelectedMonth;
-      _customerList = customerMap.values.toList();
       _totalCustomers = _customerList.length;
     }
     setState(() {});
@@ -320,7 +308,8 @@ class _DoanhThuState extends State<DoanhThu> {
                         return Card(
                           margin: EdgeInsets.symmetric(vertical: 4),
                           child: ListTile(
-                            title: Text(customer['HOTEN']),
+                            title: Text('${customer['HOTEN']}'),
+                            subtitle: Text('Mã hóa đơn: ${customer['MAHD']}'),
                             trailing: Text(
                               NumberFormat.currency(locale: 'vi', symbol: 'đ').format(customer['TONGTIEN']),
                               style: TextStyle(
