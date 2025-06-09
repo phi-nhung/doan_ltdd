@@ -1,6 +1,8 @@
-  import 'package:flutter/material.dart';
+  import 'package:doan/provider/account_provider.dart';
+import 'package:flutter/material.dart';
   import 'package:intl/intl.dart';
-  import 'package:flutter/services.dart'; 
+  import 'package:flutter/services.dart';
+import 'package:provider/provider.dart'; 
   import 'database_helper.dart'; 
 
   class QL_NhanVien extends StatefulWidget {
@@ -14,7 +16,6 @@
     List<Map<String, dynamic>> nhanvien = [];
     TextEditingController searchController = TextEditingController();
     String selectedPosition = "Tất cả";
-
     @override
     void initState() {
       super.initState();
@@ -244,7 +245,34 @@
       }
     }
 
-    void _confirmDeleteEmployee(int manv) {
+       void _confirmDeleteEmployee(int manv_curr,int manv) async {
+      // Kiểm tra username trước khi hiển thị dialog xác nhận
+      final userResult = await DatabaseHelper.rawQuery(
+        'SELECT USERNAME FROM USER WHERE MANV = ?',
+        [manv],
+      );
+      final tennv=await DatabaseHelper.rawQuery(
+        'SELECT HOTEN FROM NHANVIEN WHERE MANHANVIEN = ?',
+        [manv],
+      );
+      final tennv_curr = await DatabaseHelper.rawQuery(
+        'SELECT HoTEN FROM NHANVIEN WHERE MANHANVIEN = ?',
+        [manv_curr],
+      );
+      if (userResult.isNotEmpty && userResult.first['USERNAME'] == 'admin01') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đây là tài khoản cấp cao không thể xóa')),
+        );
+        return;
+      }
+      print(tennv);
+      if (tennv_curr.first['HOTEN']==tennv.first['HOTEN']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Bạn không thể xoá chính mình')),
+        );
+        return;
+      }
+
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
@@ -344,6 +372,9 @@
 
     @override
     Widget build(BuildContext context) {
+      
+    final nhanVienProvider = Provider.of<AccountProvider>(context);
+    final nv = nhanVienProvider.nhanVien;
       return Scaffold(
         appBar: AppBar(
           title: Text("Danh sách nhân viên"),
@@ -483,7 +514,7 @@
                                 ),
                                 IconButton(
                                   icon: Icon(Icons.delete, color: const Color.fromARGB(255, 81, 81, 81)),
-                                  onPressed: () => _confirmDeleteEmployee(emp['MANHANVIEN']),
+                                  onPressed: () => _confirmDeleteEmployee(nv!.maNhanVien,emp['MANHANVIEN']),
                                 ),
                               ],
                             ),
