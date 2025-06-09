@@ -17,7 +17,8 @@ class CartProvider with ChangeNotifier {
       );
       
       if (result.isNotEmpty) {
-        final currentStock = result.first['SOLUONGTON'] as int;
+        final currentStock = result.first['SOLUONGTON'] as int?;
+        if (currentStock == null) return false;
         return currentStock >= quantity;
       }
       return false;
@@ -27,28 +28,51 @@ class CartProvider with ChangeNotifier {
     }
   }
 
-  Future<void> addToCart(Item item, double icePercentage, double sugarPercentage, {int? tableNumber}) async {
-    if (tableNumber != null) {
-      tableItems.putIfAbsent(tableNumber, () => []);
-      final wasEmpty = tableItems[tableNumber]!.isEmpty;
-      final existing = tableItems[tableNumber]!.indexWhere((e) => e.item.id == item.id);
-      if (existing != -1) {
-        tableItems[tableNumber]![existing].quantity += 1;
+  Future<void> addToCart(Item item, {int? tableNumber}) async {
+    try {
+      // Kiểm tra tồn kho trước khi thêm vào giỏ
+      final hasStock = await checkStock(item, 1);
+      if (!hasStock) {
+        throw Exception('Sản phẩm không đủ số lượng trong kho!');
+      }
+
+      if (tableNumber != null) {
+        tableItems.putIfAbsent(tableNumber, () => []);
+        final wasEmpty = tableItems[tableNumber]!.isEmpty;
+        final existing = tableItems[tableNumber]!.indexWhere((e) => e.item.id == item.id);
+        if (existing != -1) {
+          // Kiểm tra tồn kho cho số lượng mới
+          final newQuantity = tableItems[tableNumber]![existing].quantity + 1;
+          final hasStockForNewQuantity = await checkStock(item, newQuantity);
+          if (!hasStockForNewQuantity) {
+            throw Exception('Sản phẩm không đủ số lượng trong kho!');
+          }
+          tableItems[tableNumber]![existing].quantity = newQuantity;
+        } else {
+          tableItems[tableNumber]!.add(CartItem(item: item, quantity: 1, tableNumber: tableNumber));
+        }
+        if (wasEmpty) {
+          await updateTableStatus(tableNumber, 'Đang phục vụ');
+        }
       } else {
-        tableItems[tableNumber]!.add(CartItem(item: item, quantity: 1, tableNumber: tableNumber));
+        final existing = items.indexWhere((e) => e.item.id == item.id);
+        if (existing != -1) {
+          // Kiểm tra tồn kho cho số lượng mới
+          final newQuantity = items[existing].quantity + 1;
+          final hasStockForNewQuantity = await checkStock(item, newQuantity);
+          if (!hasStockForNewQuantity) {
+            throw Exception('Sản phẩm không đủ số lượng trong kho!');
+          }
+          items[existing].quantity = newQuantity;
+        } else {
+          items.add(CartItem(item: item, quantity: 1));
+        }
       }
-      if (wasEmpty) {
-        await updateTableStatus(tableNumber, 'Đang phục vụ');
-      }
-    } else {
-      final existing = items.indexWhere((e) => e.item.id == item.id);
-      if (existing != -1) {
-        items[existing].quantity += 1;
-      } else {
-        items.add(CartItem(item: item, quantity: 1));
-      }
+      notifyListeners();
+    } catch (e) {
+      print('Lỗi khi thêm vào giỏ hàng: $e');
+      rethrow;
     }
-    notifyListeners();
   }
 
   void clearCart() {
@@ -171,26 +195,51 @@ class CartProvider with ChangeNotifier {
           [item.quantity, item.item.id]
         );
         }
-      
-        // Cập nhật tồn kho
-        
       }
 
-      // Nếu dùng chiết khấu thì trừ điểm tích lũy và cập nhật lại loại khách hàng
-      if (customer != null && pointsToDeduct > 0) {
-        final currentPoint = customer['DIEMTL'] ?? 0;
-        final newPoint = (currentPoint - pointsToDeduct) < 0 ? 0 : (currentPoint - pointsToDeduct);
-        // Xác định loại khách hàng mới
-        int newLoaiKH = 1; // mặc định vãng lai
-        if (newPoint >= 100) {
-          // Tìm loại thân thiết
-          final loai = await DatabaseHelper.rawQuery('SELECT MALOAIKH FROM LOAIKHACHHANG WHERE DIEMTITOITHIEU <= ? ORDER BY DIEMTITOITHIEU DESC LIMIT 1', [newPoint]);
-          if (loai.isNotEmpty) newLoaiKH = loai.first['MALOAIKH'];
+      // Cập nhật điểm tích lũy cho khách hàng
+      if (customer != null) {
+        if (discount > 0) {
+          // Nếu có chiết khấu, trừ điểm
+          final currentPoint = customer['DIEMTL'] ?? 0;
+          final newPoint = (currentPoint - pointsToDeduct) < 0 ? 0 : (currentPoint - pointsToDeduct);
+          
+          // Xác định loại khách hàng mới
+          int newLoaiKH = 1; // mặc định vãng lai
+          if (newPoint >= 100) {
+            // Tìm loại thân thiết
+            final loai = await DatabaseHelper.rawQuery(
+              'SELECT MALOAIKH FROM LOAIKHACHHANG WHERE DIEMTITOITHIEU <= ? ORDER BY DIEMTITOITHIEU DESC LIMIT 1', 
+              [newPoint]
+            );
+            if (loai.isNotEmpty) newLoaiKH = loai.first['MALOAIKH'];
+          }
+          
+          await DatabaseHelper.rawUpdate(
+            'UPDATE KHACHHANG SET DIEMTL = ?, MALOAIKH = ? WHERE MAKH = ?',
+            [newPoint, newLoaiKH, customer['MAKH']]
+          );
+        } else {
+          // Nếu không có chiết khấu, cộng điểm
+          final currentPoint = customer['DIEMTL'] ?? 0;
+          final newPoint = currentPoint + points;
+          
+          // Xác định loại khách hàng mới
+          int newLoaiKH = 1; // mặc định vãng lai
+          if (newPoint >= 100) {
+            // Tìm loại thân thiết
+            final loai = await DatabaseHelper.rawQuery(
+              'SELECT MALOAIKH FROM LOAIKHACHHANG WHERE DIEMTITOITHIEU <= ? ORDER BY DIEMTITOITHIEU DESC LIMIT 1', 
+              [newPoint]
+            );
+            if (loai.isNotEmpty) newLoaiKH = loai.first['MALOAIKH'];
+          }
+          
+          await DatabaseHelper.rawUpdate(
+            'UPDATE KHACHHANG SET DIEMTL = ?, MALOAIKH = ? WHERE MAKH = ?',
+            [newPoint, newLoaiKH, customer['MAKH']]
+          );
         }
-        await DatabaseHelper.rawUpdate(
-          'UPDATE KHACHHANG SET DIEMTL = ?, MALOAIKH = ? WHERE MAKH = ?',
-          [newPoint, newLoaiKH, customer['MAKH']]
-        );
       }
 
       if (tableNumber != null) {
@@ -212,37 +261,46 @@ class CartProvider with ChangeNotifier {
     CartItem oldItem,
     int newQuantity,
   ) async {
-    // Kiểm tra tồn kho trước khi cập nhật
-    final hasStock = await checkStock(oldItem.item, newQuantity);
-    if (!hasStock) {
-      throw Exception('Số lượng vượt quá tồn kho!');
-    }
+    try {
+      if (newQuantity <= 0) {
+        throw Exception('Số lượng phải lớn hơn 0!');
+      }
 
-    if (oldItem.tableNumber != null) {
-      // Cập nhật giỏ hàng theo bàn
-      final tableCart = tableItems[oldItem.tableNumber!];
-      if (tableCart != null) {
-        final index = tableCart.indexOf(oldItem);
+      // Kiểm tra tồn kho trước khi cập nhật
+      final hasStock = await checkStock(oldItem.item, newQuantity);
+      if (!hasStock) {
+        throw Exception('Số lượng vượt quá tồn kho!');
+      }
+
+      if (oldItem.tableNumber != null) {
+        // Cập nhật giỏ hàng theo bàn
+        final tableCart = tableItems[oldItem.tableNumber!];
+        if (tableCart != null) {
+          final index = tableCart.indexOf(oldItem);
+          if (index != -1) {
+            tableCart[index] = CartItem(
+              item: oldItem.item,
+              quantity: newQuantity,
+              tableNumber: oldItem.tableNumber,
+            );
+          }
+        }
+      } else {
+        // Cập nhật giỏ hàng mang về
+        final index = items.indexOf(oldItem);
         if (index != -1) {
-          tableCart[index] = CartItem(
+          items[index] = CartItem(
             item: oldItem.item,
             quantity: newQuantity,
-            tableNumber: oldItem.tableNumber,
           );
         }
       }
-    } else {
-      // Cập nhật giỏ hàng mang về
-      final index = items.indexOf(oldItem);
-      if (index != -1) {
-        items[index] = CartItem(
-          item: oldItem.item,
-          quantity: newQuantity,
-        );
-      }
+      
+      notifyListeners();
+    } catch (e) {
+      print('Lỗi khi cập nhật giỏ hàng: $e');
+      rethrow;
     }
-    
-    notifyListeners();
   }
 
   Future<void> updateTableStatus(int soban, String status) async {
