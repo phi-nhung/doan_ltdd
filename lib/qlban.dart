@@ -113,44 +113,46 @@ class _QL_BanState extends State<QL_Ban> {
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text("Sửa bàn"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: soBanCtrl,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: "Số bàn"),
-            ),
-            DropdownButton<String>(
-              value: trangThai,
-              onChanged: (val) => setState(() => trangThai = val!),
-              items: ['Trống', 'Đã đặt', 'Đang phục vụ']
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                  .toList(),
+      builder: (_) => StatefulBuilder(
+        builder: (context, setStateDialog) => AlertDialog(
+          title: Text("Sửa bàn"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: soBanCtrl,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(labelText: "Số bàn"),
+              ),
+              DropdownButton<String>(
+                value: trangThai,
+                onChanged: (val) => setStateDialog(() => trangThai = val!),
+                items: ['Trống', 'Đã đặt']
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: Text("Huỷ")),
+            ElevatedButton(
+              onPressed: () async {
+                await DatabaseHelper.update(
+                  'BAN',
+                  ban['MABAN'],
+                  {
+                    'SOBAN': int.parse(soBanCtrl.text),
+                    'TRANGTHAI': trangThai,
+                  },
+                  idColumn: 'MABAN',
+                );
+                Navigator.pop(context);
+                _loadBan();
+              },
+              child: Text("Lưu"),
             ),
           ],
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text("Huỷ")),
-          ElevatedButton(
-            onPressed: () async {
-              await DatabaseHelper.update(
-                'BAN',
-                ban['MABAN'],
-                {
-                  'SOBAN': int.parse(soBanCtrl.text),
-                  'TRANGTHAI': trangThai,
-                },
-                idColumn: 'MABAN',
-              );
-              Navigator.pop(context);
-              _loadBan();
-            },
-            child: Text("Lưu"),
-          ),
-        ],
       ),
     );
   }
@@ -308,8 +310,11 @@ class _QL_BanState extends State<QL_Ban> {
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              buildTimer(ban['THOIGIAN']),
-                              if (_isCountingTime(ban['THOIGIAN']))
+                              // Nếu trạng thái bàn khác "Trống" thì hiển thị giờ, ngược lại để trống
+                              trangThaiBan != "Trống"
+                                  ? buildTimer(ban['THOIGIAN'])
+                                  : const SizedBox(),
+                              if (trangThaiBan != "Trống" && _isCountingTime(ban['THOIGIAN']))
                                 Padding(
                                   padding: const EdgeInsets.only(left: 6),
                                   child: Icon(Icons.timer, color: Colors.green, size: 16),
@@ -395,7 +400,8 @@ class _QL_BanState extends State<QL_Ban> {
                               ),
                             ],
                           ),
-                          if (_isCountingTime(ban['THOIGIAN']))
+                          
+                          if (trangThaiBan!="Trống" && _isCountingTime(ban['THOIGIAN']))
                             Padding(
                               padding: const EdgeInsets.only(top: 4.0),
                               child: Text(

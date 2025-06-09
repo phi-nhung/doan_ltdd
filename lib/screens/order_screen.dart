@@ -140,19 +140,23 @@ import 'dart:typed_data';
             [_selectedTable, today],
           );
           if (existingBill.isEmpty) {
+            try {
             await DatabaseHelper.insert('HOADON', {
-              'MABAN': widget.datban,
+                'MABAN': _selectedTable,
               'GIO': DateTime.now().toIso8601String().substring(11, 16),
-              'NGAYTAO': DateTime.now().toIso8601String().substring(0, 10),
+                'NGAYTAO': today,
               'TRANGTHAI': 'Chưa thanh toán',
               'TONGTIEN': 0,
             });
+            } catch (e) {
+              print('Lỗi khi tạo hóa đơn mới: $e');
+              throw Exception('Không thể tạo hóa đơn mới. Vui lòng thử lại!');
+            }
           }
         }
-        cart.addToCart(
-          item,
-          tableNumber: _selectedTable,
-        );
+
+        try {
+          await cart.addToCart(item, tableNumber: _selectedTable);
         if (_selectedTable != null) {
           await updateTableStatus(
             _selectedTable!,
@@ -164,11 +168,25 @@ import 'dart:typed_data';
             content: Text(
               'Đã thêm ${item.name} vào giỏ hàng',
             ),
+              backgroundColor: Colors.green,
           ),
         );
       } catch (e) {
+          print('Lỗi khi thêm vào giỏ hàng: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
+            SnackBar(
+              content: Text(e.toString()),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        print('Lỗi trong _showOptionsDialog: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Có lỗi xảy ra. Vui lòng thử lại!'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -836,20 +854,35 @@ import 'dart:typed_data';
 
       try {
         final now = DateTime.now();
-        final points =
-            (totalAmount / 10000).floor(); // Tính điểm (1 điểm/10,000đ)
+        final points = (totalAmount / 10000).floor();
 
+        // Kiểm tra tồn kho trước khi lưu đơn hàng
+        for (var item in items) {
+          try {
+            final hasStock = await Provider.of<CartProvider>(context, listen: false)
+                .checkStock(item.item, item.quantity);
+            if (!hasStock) {
+              throw Exception('Sản phẩm ${item.item.name} không đủ số lượng trong kho!');
+            }
+          } catch (e) {
+            print('Lỗi kiểm tra tồn kho: $e');
+            throw Exception('Không thể kiểm tra tồn kho. Vui lòng thử lại!');
+          }
+        }
+
+        int? orderId;
+        try {
         // Thêm hóa đơn
         final orderSql = '''
           INSERT INTO HOADON 
-          (NGAYTAO, TONGTIEN, HINHTHUCMUA, MABAN, MANV, TENNV, GIO, DIEMCONG, GIAMGIA, PHUTHU)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (NGAYTAO, TONGTIEN, HINHTHUCMUA, MABAN, MANV, TENNV, GIO, DIEMCONG, GIAMGIA, PHUTHU, TRANGTHAI)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''';
 
-        final orderId = await DatabaseHelper.rawInsert(orderSql, [
+          orderId = await DatabaseHelper.rawInsert(orderSql, [
           now.toIso8601String(),
           totalAmount * (1 - discount / 100) + additionalFee,
-          paymentMethod,
+            tableNumber != null ? 'Uống tại bàn' : 'Mang đi',
           tableNumber,
           nhanVien.maNhanVien,
           nhanVien.hoTen,
@@ -857,15 +890,21 @@ import 'dart:typed_data';
           points,
           discount,
           additionalFee,
+            'Đã thanh toán',
         ]);
+        } catch (e) {
+          print('Lỗi khi tạo hóa đơn: $e');
+          throw Exception('Không thể tạo hóa đơn. Vui lòng thử lại!');
+        }
 
+        try {
         // Thêm chi tiết hóa đơn
         for (var item in items) {
           await DatabaseHelper.rawInsert(
             '''
             INSERT INTO CHITIETHOADON 
-            (MAHD, MASANPHAM, TENSANPHAM, SOLUONG, DONGIA, THANHTIEN, GHICHU)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+              (MAHD, MASANPHAM, TENSANPHAM, SOLUONG, DONGIA, THANHTIEN)
+              VALUES (?, ?, ?, ?, ?, ?)
           ''',
             [
               orderId,
@@ -891,15 +930,37 @@ import 'dart:typed_data';
             [item.quantity, item.quantity, item.item.id],
           );
         }
+        } catch (e) {
+          print('Lỗi khi thêm chi tiết hóa đơn: $e');
+          // Nếu có lỗi, xóa hóa đơn đã tạo
+          if (orderId != null) {
+            try {
+              await DatabaseHelper.rawUpdate('DELETE FROM HOADON WHERE MAHD = ?', [orderId]);
+            } catch (deleteError) {
+              print('Lỗi khi xóa hóa đơn sau khi thất bại: $deleteError');
+            }
+          }
+          throw Exception('Không thể lưu chi tiết hóa đơn. Vui lòng thử lại!');
+        }
 
-        // Cập nhật điểm tích lũy khách hàng nếu có
-        // TODO: Implement customer points update
-
+        try {
         // Cập nhật trạng thái bàn nếu có
         if (tableNumber != null) {
           await updateTableStatus(tableNumber, 'Trống');
         }
+
+          // Cập nhật trạng thái hóa đơn
+          await DatabaseHelper.rawUpdate(
+            'UPDATE HOADON SET TRANGTHAI = ? WHERE MAHD = ?',
+            ['Đã thanh toán', orderId],
+          );
       } catch (e) {
+          print('Lỗi khi cập nhật trạng thái: $e');
+          throw Exception('Không thể cập nhật trạng thái. Vui lòng thử lại!');
+        }
+
+      } catch (e) {
+        print('Lỗi khi lưu hóa đơn: $e');
         throw Exception('Lỗi khi lưu hóa đơn: $e');
       }
     }

@@ -139,7 +139,7 @@ class _QL_MatHangState extends State<QL_MatHang> {
                   controller: quantityController,
                   decoration: InputDecoration(
                     labelText: "Số lượng tồn",
-                    errorText: quantityController.text.isEmpty ? 'Vui lòng nhập số lượng' : null,
+                    //errorText: quantityController.text.isEmpty ? 'Vui lòng nhập số lượng' : null,
                   ),
                   keyboardType: TextInputType.number,
                   onChanged: (value) {
@@ -237,12 +237,12 @@ class _QL_MatHangState extends State<QL_MatHang> {
                   );
                   return;
                 }
-                if (quantityController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Vui lòng nhập số lượng')),
-                  );
-                  return;
-                }
+                // if (quantityController.text.isEmpty) {
+                //   ScaffoldMessenger.of(context).showSnackBar(
+                //     SnackBar(content: Text('Vui lòng nhập số lượng')),
+                //   );
+                //   return;
+                // }
                 if (selectedMaDanhMuc == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Vui lòng chọn danh mục')),
@@ -342,7 +342,7 @@ class _QL_MatHangState extends State<QL_MatHang> {
                   controller: quantityController,
                   decoration: InputDecoration(
                     labelText: "Số lượng tồn",
-                    errorText: quantityController.text.isEmpty ? 'Vui lòng nhập số lượng' : null,
+                    //errorText: quantityController.text.isEmpty ? 'Vui lòng nhập số lượng' : null,
                   ),
                   keyboardType: TextInputType.number,
                   onChanged: (value) {
@@ -440,17 +440,17 @@ class _QL_MatHangState extends State<QL_MatHang> {
                   );
                   return;
                 }
-                if (quantityController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Vui lòng nhập số lượng')),
-                  );
-                  return;
-                }
+                // if (quantityController.text.isEmpty) {
+                //   ScaffoldMessenger.of(context).showSnackBar(
+                //     SnackBar(content: Text('Vui lòng nhập số lượng')),
+                //   );
+                //   return;
+                // }
 
                 final price = double.tryParse(priceController.text) ?? 0;
-                final quantity = int.tryParse(quantityController.text) ?? 0;
+                final quantity = int.tryParse(quantityController.text) ?? null;
                 
-                if (price <= 0 || quantity < 0) {
+                if (price <= 0 ) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Giá bán phải lớn hơn 0 và số lượng không được âm!')),
                   );
@@ -694,7 +694,9 @@ class _QL_MatHangState extends State<QL_MatHang> {
                                 ),
                                 SizedBox(height: 4),
                                 Text("Giá: ${sp['GIABAN']} | ĐVT: ${sp['DONVITINH']}"),
-                                Text("SL tồn: ${sp['SOLUONGTON']} | Trạng thái: ${sp['TRANGTHAI']}"),
+                                Text(
+                                    "SL tồn: ${sp['SOLUONGTON'] == null ? '' : sp['SOLUONGTON']} | Trạng thái: ${sp['TRANGTHAI']}"
+                                  ),
                                 Text("Danh mục: ${sp['TENDANHMUC'] ?? ''}"),
                               ],
                             ),

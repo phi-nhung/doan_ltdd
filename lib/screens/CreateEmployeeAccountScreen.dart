@@ -13,6 +13,7 @@ class _CreateEmployeeAccountScreenState extends State<CreateEmployeeAccountScree
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _hotenController = TextEditingController();
   final TextEditingController _sdtController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController(); // Thêm controller xác nhận mật khẩu
 
   String _selectedChucVu = 'Nhân viên';
   final List<String> _chucVuOptions = ['Nhân viên', 'Quản lý'];
@@ -27,6 +28,7 @@ class _CreateEmployeeAccountScreenState extends State<CreateEmployeeAccountScree
     _passwordController.dispose();
     _hotenController.dispose();
     _sdtController.dispose();
+    _confirmPasswordController.dispose(); // dispose controller mới
     super.dispose();
   }
 
@@ -133,6 +135,15 @@ class _CreateEmployeeAccountScreenState extends State<CreateEmployeeAccountScree
                 isPassword: true,
                 enabled: !_daCoTaiKhoan,
               ),
+              const SizedBox(height: 15),
+              // Thêm trường xác nhận mật khẩu
+              _buildTextField(
+                controller: _confirmPasswordController,
+                labelText: 'Xác nhận lại mật khẩu',
+                icon: Icons.lock_outline,
+                isPassword: true,
+                enabled: !_daCoTaiKhoan,
+              ),
               const SizedBox(height: 30),
 
               SizedBox(
@@ -153,10 +164,11 @@ class _CreateEmployeeAccountScreenState extends State<CreateEmployeeAccountScree
 
                     final String username = _usernameController.text.trim();
                     final String password = _passwordController.text;
+                    final String confirmPassword = _confirmPasswordController.text; // Lấy xác nhận mật khẩu
                     final String hoten = _hotenController.text.trim();
                     final String sdt = _sdtController.text.trim();
 
-                    if (username.isEmpty || password.isEmpty || hoten.isEmpty || sdt.isEmpty) {
+                    if (username.isEmpty || password.isEmpty || hoten.isEmpty || sdt.isEmpty || confirmPassword.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Vui lòng điền đầy đủ thông tin.')),
                       );
@@ -173,6 +185,13 @@ class _CreateEmployeeAccountScreenState extends State<CreateEmployeeAccountScree
                     if (sdt.length != 10 || !RegExp(r'^[0-9]+$').hasMatch(sdt)) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Số điện thoại không hợp lệ.')),
+                      );
+                      return;
+                    }
+
+                    if (password != confirmPassword) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Mật khẩu xác nhận không khớp.')),
                       );
                       return;
                     }

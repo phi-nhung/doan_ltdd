@@ -52,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(height: 30),
 
               // Email Input
-              _buildTextField("User Name", Icons.email, controller: _userNameControlelr),
+              _buildTextField("Tên đăng nhập", Icons.person_outline, controller: _userNameControlelr),
               SizedBox(height: 15),
 
               // Password Input
