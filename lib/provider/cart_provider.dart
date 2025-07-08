@@ -27,7 +27,7 @@ class CartProvider with ChangeNotifier {
     }
   }
 
-  Future<void> addToCart(Item item, double icePercentage, double sugarPercentage, {int? tableNumber}) async {
+  Future<void> addToCart(Item item, {int? tableNumber}) async {
     if (tableNumber != null) {
       tableItems.putIfAbsent(tableNumber, () => []);
       final wasEmpty = tableItems[tableNumber]!.isEmpty;
@@ -160,20 +160,12 @@ class CartProvider with ChangeNotifier {
             item.item.id,                // MASP
           ]
         );
-        final slt= (await DatabaseHelper.rawQuery(
-          'SELECT SOLUONGTON FROM SANPHAM WHERE MASANPHAM = ?',
-          [item.item.id]
-        ));
-        if (slt.first['SOLUONGTON'] !='NULL')
-        {
-          await DatabaseHelper.rawUpdate(
+
+        // Cập nhật tồn kho
+        await DatabaseHelper.rawUpdate(
           'UPDATE SANPHAM SET SOLUONGTON = SOLUONGTON - ? WHERE MASANPHAM = ?',
           [item.quantity, item.item.id]
         );
-        }
-      
-        // Cập nhật tồn kho
-        
       }
 
       // Nếu dùng chiết khấu thì trừ điểm tích lũy và cập nhật lại loại khách hàng

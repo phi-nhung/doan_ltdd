@@ -130,99 +130,47 @@ import 'dart:typed_data';
       }
     }
 
-    void _showOptionsDialog(BuildContext context, Item item, CartProvider cart) {
-      double icePercentage = 50;
-      double sugarPercentage = 50;
-
-      showDialog(
-        context: context,
-        builder:
-            (context) => StatefulBuilder(
-              builder:
-                  (context, setState) => AlertDialog(
-                    title: Text("Tùy chọn cho ${item.name}"),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text("Đá: ${icePercentage.round()}%"),
-                        Slider(
-                          value: icePercentage,
-                          min: 0,
-                          max: 100,
-                          divisions: 4,
-                          label: "${icePercentage.round()}%",
-                          onChanged:
-                              (value) => setState(() => icePercentage = value),
-                        ),
-                        Text("Đường: ${sugarPercentage.round()}%"),
-                        Slider(
-                          value: sugarPercentage,
-                          min: 0,
-                          max: 100,
-                          divisions: 4,
-                          label: "${sugarPercentage.round()}%",
-                          onChanged:
-                              (value) => setState(() => sugarPercentage = value),
-                        ),
-                      ],
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text("Hủy"),
-                      ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          try {
-                            if (_selectedTable != null) {
-                              // Khi thêm món đầu tiên cho bàn
-                              final today = DateTime.now().toIso8601String().substring(0, 10);
-                              final existingBill = await DatabaseHelper.rawQuery(
-                                "SELECT * FROM HOADON WHERE MABAN = ? AND NGAYTAO = ? AND TRANGTHAI = 'Chưa thanh toán'",
-                                [_selectedTable, today],
-                              );
-                              if (existingBill.isEmpty) {
-                                await DatabaseHelper.insert('HOADON', {
-                                  'MABAN': widget.datban,
-                                  'GIO': DateTime.now().toIso8601String().substring(11, 16),
-                                  'NGAYTAO': DateTime.now().toIso8601String().substring(0, 10),
-                                  'TRANGTHAI': 'Chưa thanh toán',
-                                  'TONGTIEN': 0,
-                                });
-                              }
-                            }
-                            cart.addToCart(
-                              item,
-                              icePercentage,
-                              sugarPercentage,
-                              tableNumber: _selectedTable,
-                            );
-                            if (_selectedTable != null) {
-                              await updateTableStatus(
-                                _selectedTable!,
-                                'Đang phục vụ',
-                              );
-                            }
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Đã thêm ${item.name} vào giỏ hàng',
-                                ),
-                              ),
-                            );
-                          } catch (e) {
-                            ScaffoldMessenger.of(
-                              context,
-                            ).showSnackBar(SnackBar(content: Text(e.toString())));
-                          }
-                        },
-                        child: Text("Thêm"),
-                      ),
-                    ],
-                  ),
+    void _showOptionsDialog(BuildContext context, Item item, CartProvider cart) async {
+      try {
+        if (_selectedTable != null) {
+          // Khi thêm món đầu tiên cho bàn
+          final today = DateTime.now().toIso8601String().substring(0, 10);
+          final existingBill = await DatabaseHelper.rawQuery(
+            "SELECT * FROM HOADON WHERE MABAN = ? AND NGAYTAO = ? AND TRANGTHAI = 'Chưa thanh toán'",
+            [_selectedTable, today],
+          );
+          if (existingBill.isEmpty) {
+            await DatabaseHelper.insert('HOADON', {
+              'MABAN': widget.datban,
+              'GIO': DateTime.now().toIso8601String().substring(11, 16),
+              'NGAYTAO': DateTime.now().toIso8601String().substring(0, 10),
+              'TRANGTHAI': 'Chưa thanh toán',
+              'TONGTIEN': 0,
+            });
+          }
+        }
+        cart.addToCart(
+          item,
+          tableNumber: _selectedTable,
+        );
+        if (_selectedTable != null) {
+          await updateTableStatus(
+            _selectedTable!,
+            'Đang phục vụ',
+          );
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Đã thêm ${item.name} vào giỏ hàng',
             ),
-      );
+          ),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
     }
 
     @override
